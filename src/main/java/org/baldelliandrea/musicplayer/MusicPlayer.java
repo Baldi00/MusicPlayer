@@ -22,6 +22,9 @@ public class MusicPlayer {
     private List<Song> songsQueue;
     private int songsQueuePosition;
 
+    private RepeatMode repeatMode = RepeatMode.REPEAT;
+    private boolean shuffle;
+
     public MusicPlayer() {
         musicPlayer = new BasicPlayer();
         addListener();
@@ -40,6 +43,7 @@ public class MusicPlayer {
             musicPlayer.stop();
             musicPlayer.play();
             isPlaying = true;
+            musicPlayerFrame.updatePlayPauseButton(true);
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
@@ -52,6 +56,7 @@ public class MusicPlayer {
             else
                 musicPlayer.resume();
             isPlaying = !isPlaying;
+            musicPlayerFrame.updatePlayPauseButton(isPlaying);
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +77,7 @@ public class MusicPlayer {
     }
 
     public void setSongsQueue(List<Song> songsQueue) {
-        this.songsQueue = new ArrayList<>(songsQueue);
+        this.songsQueue = songsQueue;
     }
 
     public void setPositionInSongQueue(int position) {
@@ -87,11 +92,53 @@ public class MusicPlayer {
     }
 
     public void nextPositionInSongQueue() {
-        setPositionInSongQueue(songsQueuePosition + 1);
+        switch (repeatMode) {
+            case REPEAT:
+                setPositionInSongQueue(songsQueuePosition + 1);
+                break;
+            case REPEAT_ONCE:
+                setPositionInSongQueue(songsQueuePosition);
+                break;
+            case REPEAT_OFF:
+                if (songsQueuePosition + 1 >= songsQueue.size()) {
+                    try {
+                        musicPlayer.stop();
+                    } catch (BasicPlayerException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return;
+                }
+                setPositionInSongQueue(songsQueuePosition + 1);
+                break;
+        }
     }
 
     public void prevPositionInSongQueue() {
         setPositionInSongQueue(songsQueuePosition - 1);
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public void setRepeatMode(RepeatMode repeatMode) {
+        this.repeatMode = repeatMode;
+    }
+
+    public void setShuffle(boolean shuffle) {
+        this.shuffle = shuffle;
+    }
+
+    public RepeatMode getRepeatMode() {
+        return repeatMode;
+    }
+
+    public boolean isShuffle() {
+        return shuffle;
+    }
+
+    public Song getCurrentPlayingSong(){
+        return songsQueue.get(songsQueuePosition);
     }
 
     private void addListener() {

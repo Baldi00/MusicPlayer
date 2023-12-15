@@ -1,6 +1,7 @@
 package org.baldelliandrea.ui;
 
 import org.baldelliandrea.musicplayer.MusicPlayer;
+import org.baldelliandrea.musicplayer.RepeatMode;
 import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongTitleComparator;
 
@@ -9,8 +10,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -30,6 +29,7 @@ public class MusicPlayerFrame extends JFrame {
 
     private List<JButton> playlistButtons;
     private List<Song> songsQueue;
+    private List<Song> currentPlayingQueueOrdered;
 
     private Map<Song, JButton> songsButtons;
     private Map<String, JButton> artistsButtons;
@@ -87,6 +87,11 @@ public class MusicPlayerFrame extends JFrame {
         currentSongInfoLabel.setIcon(new ImageIcon(currentSong.getCoverPath100()));
     }
 
+    public void updatePlayPauseButton(boolean isPlaying) {
+        ImageIcon icon = isPlaying ? pauseIcon : playIcon;
+        playButton.setIcon(scaleIcon(icon, 60));
+    }
+
     private void loadControlsSprites() {
         playIcon = getSpriteResource("controls/play-circle.png");
         pauseIcon = getSpriteResource("controls/pause-circle.png");
@@ -126,25 +131,7 @@ public class MusicPlayerFrame extends JFrame {
             songButton.addActionListener(actionEvent -> {
                 songSlider.setEnabled(true);
 
-                while (songsQueue.get(0) != song) {
-                    Song s = songsQueue.remove(0);
-                    songsQueue.add(s);
-                }
-
-                musicPlayer.setSongsQueue(songsQueue);
-                musicPlayer.setPositionInSongQueue(0);
-
-                queueButtonsPanel.removeAll();
-                for (int i = 0; i < songsQueue.size(); i++) {
-                    JButton queueButton = createSongButton(formatSongText(songsQueue.get(i).getTitle(), songsQueue.get(i).getArtist(),
-                            songsQueue.get(i).getAlbum(), 3), new ImageIcon(songsQueue.get(i).getCoverPath45()));
-                    int finalI = i;
-                    queueButton.addActionListener(actionEvent1 -> {
-                        musicPlayer.setPositionInSongQueue(finalI);
-                    });
-                    queueButtonsPanel.add(queueButton);
-                }
-                validate();
+                setupSongQueueAndPlay(song, songsQueue);
             });
             songsButtons.put(song, songButton);
         }
@@ -156,6 +143,35 @@ public class MusicPlayerFrame extends JFrame {
             ImageIcon cover45 = new ImageIcon(song.getCoverPath45());
             albumsButtons.put(song.getAlbum(), createSongButton(song.getAlbum(), cover45));
         }
+    }
+
+    private void setupSongQueueAndPlay(Song currentSong, List<Song> queue) {
+        currentPlayingQueueOrdered = new ArrayList<>(queue);
+
+        List<Song> currentPlayingQueue = new ArrayList<>(currentPlayingQueueOrdered);
+        if (musicPlayer.isShuffle())
+            Collections.shuffle(currentPlayingQueue);
+
+        while (currentPlayingQueue.get(0) != currentSong) {
+            Song s = currentPlayingQueue.remove(0);
+            currentPlayingQueue.add(s);
+        }
+
+        musicPlayer.setSongsQueue(currentPlayingQueue);
+        musicPlayer.setPositionInSongQueue(0);
+
+        queueButtonsPanel.removeAll();
+        for (int i = 0; i < currentPlayingQueue.size(); i++) {
+            Song s = currentPlayingQueue.get(i);
+            JButton queueButton = createSongButton(formatSongText(s.getTitle(), s.getArtist(), s.getAlbum(), 3),
+                    new ImageIcon(s.getCoverPath45()));
+            int finalI = i;
+            queueButton.addActionListener(actionEvent1 -> {
+                musicPlayer.setPositionInSongQueue(finalI);
+            });
+            queueButtonsPanel.add(queueButton);
+        }
+        validate();
     }
 
     private JButton createSongButton(String innerText, ImageIcon icon) {
@@ -170,10 +186,24 @@ public class MusicPlayerFrame extends JFrame {
 
     private void createControlButtons() {
         playButton = createControlButton(playIcon, 60);
+        playButton.addActionListener(actionEvent -> musicPlayer.togglePlayPause());
         prevButton = createControlButton(prevIcon, 40);
+        prevButton.addActionListener(actionEvent -> musicPlayer.prevPositionInSongQueue());
         nextButton = createControlButton(nextIcon, 40);
-        shuffleButton = createControlButton(shuffleIcon, 20);
+        nextButton.addActionListener(actionEvent -> musicPlayer.nextPositionInSongQueue());
+        shuffleButton = createControlButton(shuffleOffIcon, 20);
+        shuffleButton.addActionListener(actionEvent -> {
+            musicPlayer.setShuffle(!musicPlayer.isShuffle());
+            updateShuffleButton(musicPlayer.isShuffle());
+            setupSongQueueAndPlay(musicPlayer.getCurrentPlayingSong(), currentPlayingQueueOrdered);
+        });
         repeatButton = createControlButton(repeatIcon, 20);
+        repeatButton.addActionListener(actionEvent -> {
+            RepeatMode nextRepeatMode = RepeatMode.values()[musicPlayer.getRepeatMode().ordinal() + 1 % 3];
+            musicPlayer.setRepeatMode(nextRepeatMode);
+            updateRepeatButton(nextRepeatMode);
+        });
+
     }
 
     private JButton createControlButton(ImageIcon icon, int size) {
@@ -391,5 +421,26 @@ public class MusicPlayerFrame extends JFrame {
                 albumsButtonsPanel.add(albumsButtons.get(album));
 
         validate();
+    }
+
+    private void updateRepeatButton(RepeatMode repeatMode) {
+        ImageIcon icon = null;
+        switch (repeatMode) {
+            case REPEAT:
+                icon = repeatIcon;
+                break;
+            case REPEAT_OFF:
+                icon = repeatOffIcon;
+                break;
+            case REPEAT_ONCE:
+                icon = repeat1Icon;
+                break;
+        }
+        repeatButton.setIcon(scaleIcon(icon, 20));
+    }
+
+    private void updateShuffleButton(boolean shuffle) {
+        ImageIcon icon = shuffle ? shuffleIcon : shuffleOffIcon;
+        shuffleButton.setIcon(scaleIcon(icon, 20));
     }
 }
