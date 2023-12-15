@@ -18,6 +18,7 @@ public class Main {
         musicPlayer = new MusicPlayer();
         musicPlayer.setMusicFilePath("Path to music");
         musicPlayer.play();
+        MusicPlayerFrame musicPlayerFrame = new MusicPlayerFrame();
     }
 
     private static void createMediaControlWindow() {
