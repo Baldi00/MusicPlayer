@@ -123,10 +123,12 @@ public class MusicPlayer {
 
     public void setRepeatMode(RepeatMode repeatMode) {
         this.repeatMode = repeatMode;
+        musicPlayerFrame.updateRepeatButton(repeatMode);
     }
 
     public void setShuffle(boolean shuffle) {
         this.shuffle = shuffle;
+        musicPlayerFrame.updateShuffleButton(shuffle);
     }
 
     public RepeatMode getRepeatMode() {
@@ -137,7 +139,9 @@ public class MusicPlayer {
         return shuffle;
     }
 
-    public Song getCurrentPlayingSong(){
+    public Song getCurrentPlayingSong() {
+        if(songsQueue == null)
+            return null;
         return songsQueue.get(songsQueuePosition);
     }
 

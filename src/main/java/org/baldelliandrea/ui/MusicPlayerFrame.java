@@ -92,6 +92,27 @@ public class MusicPlayerFrame extends JFrame {
         playButton.setIcon(scaleIcon(icon, 60));
     }
 
+    public void updateRepeatButton(RepeatMode repeatMode) {
+        ImageIcon icon = null;
+        switch (repeatMode) {
+            case REPEAT:
+                icon = repeatIcon;
+                break;
+            case REPEAT_OFF:
+                icon = repeatOffIcon;
+                break;
+            case REPEAT_ONCE:
+                icon = repeat1Icon;
+                break;
+        }
+        repeatButton.setIcon(scaleIcon(icon, 20));
+    }
+
+    public void updateShuffleButton(boolean shuffle) {
+        ImageIcon icon = shuffle ? shuffleIcon : shuffleOffIcon;
+        shuffleButton.setIcon(scaleIcon(icon, 20));
+    }
+
     private void loadControlsSprites() {
         playIcon = getSpriteResource("controls/play-circle.png");
         pauseIcon = getSpriteResource("controls/pause-circle.png");
@@ -146,16 +167,20 @@ public class MusicPlayerFrame extends JFrame {
     }
 
     private void setupSongQueueAndPlay(Song currentSong, List<Song> queue) {
+        if(queue == null)
+            return;
+
         currentPlayingQueueOrdered = new ArrayList<>(queue);
 
         List<Song> currentPlayingQueue = new ArrayList<>(currentPlayingQueueOrdered);
         if (musicPlayer.isShuffle())
             Collections.shuffle(currentPlayingQueue);
 
-        while (currentPlayingQueue.get(0) != currentSong) {
-            Song s = currentPlayingQueue.remove(0);
-            currentPlayingQueue.add(s);
-        }
+        if (currentSong != null)
+            while (currentPlayingQueue.get(0) != currentSong) {
+                Song s = currentPlayingQueue.remove(0);
+                currentPlayingQueue.add(s);
+            }
 
         musicPlayer.setSongsQueue(currentPlayingQueue);
         musicPlayer.setPositionInSongQueue(0);
@@ -194,14 +219,12 @@ public class MusicPlayerFrame extends JFrame {
         shuffleButton = createControlButton(shuffleOffIcon, 20);
         shuffleButton.addActionListener(actionEvent -> {
             musicPlayer.setShuffle(!musicPlayer.isShuffle());
-            updateShuffleButton(musicPlayer.isShuffle());
             setupSongQueueAndPlay(musicPlayer.getCurrentPlayingSong(), currentPlayingQueueOrdered);
         });
         repeatButton = createControlButton(repeatIcon, 20);
         repeatButton.addActionListener(actionEvent -> {
-            RepeatMode nextRepeatMode = RepeatMode.values()[musicPlayer.getRepeatMode().ordinal() + 1 % 3];
+            RepeatMode nextRepeatMode = RepeatMode.values()[(musicPlayer.getRepeatMode().ordinal() + 1) % 3];
             musicPlayer.setRepeatMode(nextRepeatMode);
-            updateRepeatButton(nextRepeatMode);
         });
 
     }
@@ -421,26 +444,5 @@ public class MusicPlayerFrame extends JFrame {
                 albumsButtonsPanel.add(albumsButtons.get(album));
 
         validate();
-    }
-
-    private void updateRepeatButton(RepeatMode repeatMode) {
-        ImageIcon icon = null;
-        switch (repeatMode) {
-            case REPEAT:
-                icon = repeatIcon;
-                break;
-            case REPEAT_OFF:
-                icon = repeatOffIcon;
-                break;
-            case REPEAT_ONCE:
-                icon = repeat1Icon;
-                break;
-        }
-        repeatButton.setIcon(scaleIcon(icon, 20));
-    }
-
-    private void updateShuffleButton(boolean shuffle) {
-        ImageIcon icon = shuffle ? shuffleIcon : shuffleOffIcon;
-        shuffleButton.setIcon(scaleIcon(icon, 20));
     }
 }
