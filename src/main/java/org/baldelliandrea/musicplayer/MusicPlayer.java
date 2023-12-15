@@ -2,6 +2,7 @@ package org.baldelliandrea.musicplayer;
 
 import javazoom.jlgui.basicplayer.*;
 import org.baldelliandrea.song.Song;
+import org.baldelliandrea.ui.MediaControlFrame;
 import org.baldelliandrea.ui.MusicPlayerFrame;
 
 import java.io.File;
@@ -18,6 +19,7 @@ public class MusicPlayer {
     private long currentSongMicroseconds;
 
     private MusicPlayerFrame musicPlayerFrame;
+    private MediaControlFrame mediaControlFrame;
 
     private List<Song> songsQueue;
     private int songsQueuePosition;
@@ -44,6 +46,7 @@ public class MusicPlayer {
             musicPlayer.play();
             isPlaying = true;
             musicPlayerFrame.updatePlayPauseButton(true);
+            mediaControlFrame.updatePlayPauseButton(true);
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
@@ -57,6 +60,7 @@ public class MusicPlayer {
                 musicPlayer.resume();
             isPlaying = !isPlaying;
             musicPlayerFrame.updatePlayPauseButton(isPlaying);
+            mediaControlFrame.updatePlayPauseButton(isPlaying);
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
@@ -76,6 +80,10 @@ public class MusicPlayer {
         this.musicPlayerFrame = musicPlayerFrame;
     }
 
+    public void setMediaControlFrame(MediaControlFrame mediaControlFrame) {
+        this.mediaControlFrame = mediaControlFrame;
+    }
+
     public void setSongsQueue(List<Song> songsQueue) {
         this.songsQueue = songsQueue;
     }
@@ -87,6 +95,7 @@ public class MusicPlayer {
         if (position >= songsQueue.size())
             songsQueuePosition = Math.min(songsQueue.size() - 1, position - songsQueue.size());
         musicPlayerFrame.updateCurrentSong(songsQueue.get(songsQueuePosition));
+        mediaControlFrame.updateCurrentSong(songsQueue.get(songsQueuePosition));
         setMusicFilePath(songsQueue.get(songsQueuePosition).getPath());
         play();
     }
@@ -157,6 +166,7 @@ public class MusicPlayer {
             public void progress(int i, long l, byte[] bytes, Map map) {
                 currentSongMicroseconds = (long) map.get("mp3.position.microseconds");
                 musicPlayerFrame.updateSlider((int) currentSongMicroseconds, (int) songLengthMicroseconds);
+                mediaControlFrame.updateSlider((int) currentSongMicroseconds, (int) songLengthMicroseconds);
             }
 
             @Override

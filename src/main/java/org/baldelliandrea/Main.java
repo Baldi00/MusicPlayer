@@ -6,6 +6,7 @@ import org.baldelliandrea.musicplayer.MusicPlayer;
 import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongCacheManager;
 import org.baldelliandrea.ui.HideWindowDelayedThread;
+import org.baldelliandrea.ui.MediaControlFrame;
 import org.baldelliandrea.ui.MusicPlayerFrame;
 
 import java.awt.*;
@@ -15,7 +16,7 @@ import java.util.TreeMap;
 import javax.swing.*;
 
 public class Main {
-    private static JFrame mediaControlWindow;
+    private static MediaControlFrame mediaControlFrame;
     private static HideWindowDelayedThread hideWindowDelayedThread;
 
     private static MusicPlayer musicPlayer;
@@ -26,23 +27,13 @@ public class Main {
     public static void main(String[] args) {
         registerHotkeys();
         setLookAndFeel();
-        createMediaControlWindow();
         songCacheManager = new SongCacheManager();
         loadSongList("C:\\Users\\Andrea\\Music\\Andrea");
         musicPlayer = new MusicPlayer();
         MusicPlayerFrame musicPlayerFrame = new MusicPlayerFrame(songsList, musicPlayer);
+        mediaControlFrame = new MediaControlFrame(musicPlayer);
         musicPlayer.setMusicPlayerFrame(musicPlayerFrame);
-    }
-
-    private static void createMediaControlWindow() {
-        EventQueue.invokeLater(() -> {
-            mediaControlWindow = new JFrame();
-            mediaControlWindow.setSize(600, 200);
-            mediaControlWindow.setUndecorated(true);
-            mediaControlWindow.setLocation(50, 50);
-            mediaControlWindow.setType(JFrame.Type.UTILITY);
-//            com.sun.awt.AWTUtilities.setWindowOpacity(mediaControlWindow, 0.9f);
-        });
+        musicPlayer.setMediaControlFrame(mediaControlFrame);
     }
 
     private static void showMediaControlWindow() {
@@ -50,8 +41,8 @@ public class Main {
             if (hideWindowDelayedThread != null)
                 hideWindowDelayedThread.interrupt();
 
-            mediaControlWindow.setVisible(true);
-            hideWindowDelayedThread = new HideWindowDelayedThread(mediaControlWindow, 2);
+            mediaControlFrame.setVisible(true);
+            hideWindowDelayedThread = new HideWindowDelayedThread(mediaControlFrame, 4);
             hideWindowDelayedThread.start();
         });
     }
@@ -68,26 +59,19 @@ public class Main {
         JIntellitype.getInstance().addIntellitypeListener(command -> {
             switch (command) {
                 case JIntellitype.APPCOMMAND_MEDIA_PLAY_PAUSE:
-                    System.out.println("Play/Pause message received");
                     musicPlayer.togglePlayPause();
                     showMediaControlWindow();
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
-                    System.out.println("Next message received");
                     musicPlayer.nextPositionInSongQueue();
                     showMediaControlWindow();
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_PREVIOUSTRACK:
-                    System.out.println("Previous message received");
                     musicPlayer.prevPositionInSongQueue();
                     showMediaControlWindow();
                     break;
                 case JIntellitype.APPCOMMAND_VOLUME_UP:
-                    System.out.println("Volume up message received");
-                    showMediaControlWindow();
-                    break;
                 case JIntellitype.APPCOMMAND_VOLUME_DOWN:
-                    System.out.println("Volume down message received");
                     showMediaControlWindow();
                     break;
                 default:

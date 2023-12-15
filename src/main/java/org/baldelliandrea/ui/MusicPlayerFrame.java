@@ -167,7 +167,7 @@ public class MusicPlayerFrame extends JFrame {
     }
 
     private void setupSongQueueAndPlay(Song currentSong, List<Song> queue) {
-        if(queue == null)
+        if (queue == null)
             return;
 
         currentPlayingQueueOrdered = new ArrayList<>(queue);
@@ -347,7 +347,8 @@ public class MusicPlayerFrame extends JFrame {
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 JSlider slider = (JSlider) mouseEvent.getSource();
-                musicPlayer.setPosition((float) slider.getValue() / slider.getMaximum());
+                if (slider.isEnabled())
+                    musicPlayer.setPosition((float) slider.getValue() / slider.getMaximum());
             }
 
             @Override
@@ -378,7 +379,7 @@ public class MusicPlayerFrame extends JFrame {
         sliderPanel.add(songTotalTimeLabel, BorderLayout.EAST);
 
         JPanel currentSongPanel = new JPanel(new BorderLayout());
-        currentSongPanel.setPreferredSize(new Dimension(500, 0));
+        currentSongPanel.setPreferredSize(new Dimension(700, 0));
 
         currentSongInfoLabel = new JLabel();
         currentSongInfoLabel.setText(formatSongText("Title", "Artist", "Album", 5));
