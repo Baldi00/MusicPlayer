@@ -9,6 +9,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -27,7 +29,7 @@ public class MusicPlayerFrame extends JFrame {
     private JPanel queueButtonsPanel;
 
     private List<JButton> playlistButtons;
-    private List<JButton> queueButtons;
+    private List<Song> songsQueue;
 
     private Map<Song, JButton> songsButtons;
     private Map<String, JButton> artistsButtons;
@@ -54,14 +56,12 @@ public class MusicPlayerFrame extends JFrame {
     private JLabel songCurrentTimeLabel;
     private JLabel songTotalTimeLabel;
 
-    private Song currentSong;
-
     public MusicPlayerFrame(TreeMap<String, Song> songsList, MusicPlayer musicPlayer) {
         this.songsList = songsList;
         this.musicPlayer = musicPlayer;
 
         playlistButtons = new ArrayList<>();
-        queueButtons = new ArrayList<>();
+        songsQueue = new ArrayList<>();
         loadControlsSprites();
         createTitleArtistAlbumButtons();
         createControlButtons();
@@ -82,6 +82,11 @@ public class MusicPlayerFrame extends JFrame {
         songSlider.setValue(value);
     }
 
+    public void updateCurrentSong(Song currentSong) {
+        currentSongInfoLabel.setText(formatSongText(currentSong.getTitle(), currentSong.getArtist(), currentSong.getAlbum(), 5));
+        currentSongInfoLabel.setIcon(new ImageIcon(currentSong.getCoverPath100()));
+    }
+
     private void loadControlsSprites() {
         playIcon = getSpriteResource("controls/play-circle.png");
         pauseIcon = getSpriteResource("controls/pause-circle.png");
@@ -98,6 +103,7 @@ public class MusicPlayerFrame extends JFrame {
         // Prepare songs, artists and albums lists
         List<Song> songsByTitle = new ArrayList<>(songsList.values());
         songsByTitle.sort(new SongTitleComparator());
+        songsQueue.addAll(songsByTitle);
 
         Map<String, Song> songsByArtist = new TreeMap<>();
         for (Song song : songsByTitle)
@@ -118,12 +124,27 @@ public class MusicPlayerFrame extends JFrame {
             ImageIcon cover45 = new ImageIcon(song.getCoverPath45());
             JButton songButton = createSongButton(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 3), cover45);
             songButton.addActionListener(actionEvent -> {
-                currentSong = song;
-                currentSongInfoLabel.setText(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 5));
-                currentSongInfoLabel.setIcon(new ImageIcon(song.getCoverPath100()));
-                musicPlayer.setMusicFilePath(song.getPath());
-                musicPlayer.play();
                 songSlider.setEnabled(true);
+
+                while (songsQueue.get(0) != song) {
+                    Song s = songsQueue.remove(0);
+                    songsQueue.add(s);
+                }
+
+                musicPlayer.setSongsQueue(songsQueue);
+                musicPlayer.setPositionInSongQueue(0);
+
+                queueButtonsPanel.removeAll();
+                for (int i = 0; i < songsQueue.size(); i++) {
+                    JButton queueButton = createSongButton(formatSongText(songsQueue.get(i).getTitle(), songsQueue.get(i).getArtist(),
+                            songsQueue.get(i).getAlbum(), 3), new ImageIcon(songsQueue.get(i).getCoverPath45()));
+                    int finalI = i;
+                    queueButton.addActionListener(actionEvent1 -> {
+                        musicPlayer.setPositionInSongQueue(finalI);
+                    });
+                    queueButtonsPanel.add(queueButton);
+                }
+                validate();
             });
             songsButtons.put(song, songButton);
         }
@@ -212,7 +233,7 @@ public class MusicPlayerFrame extends JFrame {
         JPanel songsPanelContainer = populateButtonsPanel(songsButtonsPanel, songsButtons.values(), "Songs");
         JPanel artistsPanelContainer = populateButtonsPanel(artistsButtonsPanel, artistsButtons.values(), "Artists");
         JPanel albumsPanelContainer = populateButtonsPanel(albumsButtonsPanel, albumsButtons.values(), "Albums");
-        JPanel queuePanelContainer = populateButtonsPanel(queueButtonsPanel, queueButtons, "Queue");
+        JPanel queuePanelContainer = populateButtonsPanel(queueButtonsPanel, null, "Queue");
 
         centralPanel.add(playlistPanelContainer);
         centralPanel.add(songsPanelContainer);
@@ -229,8 +250,9 @@ public class MusicPlayerFrame extends JFrame {
         JPanel scrollContainer1 = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane();
 
-        for (JButton button : buttonList)
-            buttonsPanel.add(button);
+        if (buttonList != null)
+            for (JButton button : buttonList)
+                buttonsPanel.add(button);
         scrollContainer1.add(buttonsPanel, BorderLayout.NORTH);
 
         scrollPane.setViewportView(scrollContainer1);
@@ -351,11 +373,14 @@ public class MusicPlayerFrame extends JFrame {
 
         searchInput = searchInput.toLowerCase();
 
+        songsQueue.clear();
         for (Song song : songsButtons.keySet())
             if (song.getTitle().toLowerCase().contains(searchInput) ||
                     song.getArtist().toLowerCase().contains(searchInput) ||
-                    song.getAlbum().toLowerCase().contains(searchInput))
+                    song.getAlbum().toLowerCase().contains(searchInput)) {
                 songsButtonsPanel.add(songsButtons.get(song));
+                songsQueue.add(song);
+            }
 
         for (String artist : artistsButtons.keySet())
             if (artist.toLowerCase().contains(searchInput))

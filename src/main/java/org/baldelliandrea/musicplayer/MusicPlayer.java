@@ -1,9 +1,12 @@
 package org.baldelliandrea.musicplayer;
 
 import javazoom.jlgui.basicplayer.*;
+import org.baldelliandrea.song.Song;
 import org.baldelliandrea.ui.MusicPlayerFrame;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MusicPlayer {
@@ -15,6 +18,9 @@ public class MusicPlayer {
     private long currentSongMicroseconds;
 
     private MusicPlayerFrame musicPlayerFrame;
+
+    private List<Song> songsQueue;
+    private int songsQueuePosition;
 
     public MusicPlayer() {
         musicPlayer = new BasicPlayer();
@@ -65,6 +71,29 @@ public class MusicPlayer {
         this.musicPlayerFrame = musicPlayerFrame;
     }
 
+    public void setSongsQueue(List<Song> songsQueue) {
+        this.songsQueue = new ArrayList<>(songsQueue);
+    }
+
+    public void setPositionInSongQueue(int position) {
+        songsQueuePosition = position;
+        if (position < 0)
+            songsQueuePosition = Math.max(0, songsQueue.size() - 1 + position);
+        if (position >= songsQueue.size())
+            songsQueuePosition = Math.min(songsQueue.size() - 1, position - songsQueue.size());
+        musicPlayerFrame.updateCurrentSong(songsQueue.get(songsQueuePosition));
+        setMusicFilePath(songsQueue.get(songsQueuePosition).getPath());
+        play();
+    }
+
+    public void nextPositionInSongQueue() {
+        setPositionInSongQueue(songsQueuePosition + 1);
+    }
+
+    public void prevPositionInSongQueue() {
+        setPositionInSongQueue(songsQueuePosition - 1);
+    }
+
     private void addListener() {
         musicPlayer.addBasicPlayerListener(new BasicPlayerListener() {
             @Override
@@ -81,6 +110,8 @@ public class MusicPlayer {
 
             @Override
             public void stateUpdated(BasicPlayerEvent basicPlayerEvent) {
+                if (basicPlayerEvent.getCode() == BasicPlayerEvent.EOM)
+                    nextPositionInSongQueue();
             }
 
             @Override

@@ -74,10 +74,12 @@ public class Main {
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
                     System.out.println("Next message received");
+                    musicPlayer.nextPositionInSongQueue();
                     showMediaControlWindow();
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_PREVIOUSTRACK:
                     System.out.println("Previous message received");
+                    musicPlayer.prevPositionInSongQueue();
                     showMediaControlWindow();
                     break;
                 case JIntellitype.APPCOMMAND_VOLUME_UP:
