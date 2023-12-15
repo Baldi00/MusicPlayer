@@ -1,4 +1,4 @@
-package org.baldelliandrea;
+package org.baldelliandrea.ui;
 
 import javax.swing.*;
 
@@ -6,7 +6,7 @@ public class HideWindowDelayedThread extends Thread {
     private JFrame window;
     private float delaySeconds;
 
-    HideWindowDelayedThread(JFrame window, float delaySeconds) {
+    public HideWindowDelayedThread(JFrame window, float delaySeconds) {
         this.window = window;
         this.delaySeconds = delaySeconds;
     }

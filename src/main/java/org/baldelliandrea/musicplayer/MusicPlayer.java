@@ -1,4 +1,4 @@
-package org.baldelliandrea;
+package org.baldelliandrea.musicplayer;
 
 import javazoom.jlgui.basicplayer.*;
 
