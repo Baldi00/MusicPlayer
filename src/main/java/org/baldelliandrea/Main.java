@@ -5,15 +5,19 @@ import com.melloware.jintellitype.JIntellitype;
 
 import java.awt.*;
 import javax.swing.*;
-
 public class Main {
     private static JFrame mediaControlWindow;
     private static HideWindowDelayedThread hideWindowDelayedThread;
+
+    private static MusicPlayer musicPlayer;
 
     public static void main(String[] args) {
         registerHotkeys();
         setLookAndFeel();
         createMediaControlWindow();
+        musicPlayer = new MusicPlayer();
+        musicPlayer.setMusicFilePath("Path to music");
+        musicPlayer.play();
     }
 
     private static void createMediaControlWindow() {
@@ -29,7 +33,7 @@ public class Main {
 
     private static void showMediaControlWindow() {
         EventQueue.invokeLater(() -> {
-            if(hideWindowDelayedThread != null)
+            if (hideWindowDelayedThread != null)
                 hideWindowDelayedThread.interrupt();
 
             mediaControlWindow.setVisible(true);
@@ -51,6 +55,7 @@ public class Main {
             switch (command) {
                 case JIntellitype.APPCOMMAND_MEDIA_PLAY_PAUSE:
                     System.out.println("Play/Pause message received");
+                    musicPlayer.togglePlayPause();
                     showMediaControlWindow();
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
