@@ -16,6 +16,8 @@ import java.util.TreeMap;
 import javax.swing.*;
 
 public class Main {
+    private static final float MEDIA_CONTROL_WIDGET_DELAY = 3f;
+
     private static MediaControlFrame mediaControlFrame;
     private static HideWindowDelayedThread hideWindowDelayedThread;
 
@@ -42,7 +44,7 @@ public class Main {
                 hideWindowDelayedThread.interrupt();
 
             mediaControlFrame.setVisible(true);
-            hideWindowDelayedThread = new HideWindowDelayedThread(mediaControlFrame, 4);
+            hideWindowDelayedThread = new HideWindowDelayedThread(mediaControlFrame, MEDIA_CONTROL_WIDGET_DELAY);
             hideWindowDelayedThread.start();
         });
     }

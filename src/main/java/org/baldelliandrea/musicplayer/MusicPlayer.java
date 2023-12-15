@@ -24,7 +24,7 @@ public class MusicPlayer {
     private List<Song> songsQueue;
     private int songsQueuePosition;
 
-    private RepeatMode repeatMode = RepeatMode.REPEAT;
+    private RepeatMode repeatMode = RepeatMode.REPEAT_OFF;
     private boolean shuffle;
 
     public MusicPlayer() {
