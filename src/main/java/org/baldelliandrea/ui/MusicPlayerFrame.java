@@ -1,14 +1,15 @@
 package org.baldelliandrea.ui;
 
+import org.baldelliandrea.musicplayer.MusicPlayer;
 import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongTitleComparator;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class MusicPlayerFrame extends JFrame {
     private TreeMap<String, Song> songsList;
+    private MusicPlayer musicPlayer;
 
     private JPanel playlistButtonsPanel;
     private JPanel songsButtonsPanel;
@@ -47,8 +49,16 @@ public class MusicPlayerFrame extends JFrame {
     private JButton shuffleButton;
     private JButton repeatButton;
 
-    public MusicPlayerFrame(TreeMap<String, Song> songsList) {
+    private JLabel currentSongInfoLabel;
+    private JSlider songSlider;
+    private JLabel songCurrentTimeLabel;
+    private JLabel songTotalTimeLabel;
+
+    private Song currentSong;
+
+    public MusicPlayerFrame(TreeMap<String, Song> songsList, MusicPlayer musicPlayer) {
         this.songsList = songsList;
+        this.musicPlayer = musicPlayer;
 
         playlistButtons = new ArrayList<>();
         queueButtons = new ArrayList<>();
@@ -56,6 +66,20 @@ public class MusicPlayerFrame extends JFrame {
         createTitleArtistAlbumButtons();
         createControlButtons();
         createAndShowWindow();
+    }
+
+    public void updateSlider(int value, int max) {
+        int totalMinutes = max / 1000000 / 60;
+        int totalSeconds = (max / 1000000) % 60;
+        long currentMinutes = value / 1000000 / 60;
+        long currentSeconds = (value / 1000000) % 60;
+
+        songCurrentTimeLabel.setText(String.format("%02d:%02d", currentMinutes, currentSeconds));
+        songTotalTimeLabel.setText(String.format("%02d:%02d", totalMinutes, totalSeconds));
+
+        songSlider.setMinimum(0);
+        songSlider.setMaximum(max);
+        songSlider.setValue(value);
     }
 
     private void loadControlsSprites() {
@@ -92,8 +116,16 @@ public class MusicPlayerFrame extends JFrame {
 
         for (Song song : songsByTitle) {
             ImageIcon cover45 = new ImageIcon(song.getCoverPath45());
-            songsButtons.put(song,
-                    createSongButton(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 3), cover45));
+            JButton songButton = createSongButton(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 3), cover45);
+            songButton.addActionListener(actionEvent -> {
+                currentSong = song;
+                currentSongInfoLabel.setText(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 5));
+                currentSongInfoLabel.setIcon(new ImageIcon(song.getCoverPath100()));
+                musicPlayer.setMusicFilePath(song.getPath());
+                musicPlayer.play();
+                songSlider.setEnabled(true);
+            });
+            songsButtons.put(song, songButton);
         }
 
         for (Song song : songsByArtist.values())
@@ -224,22 +256,68 @@ public class MusicPlayerFrame extends JFrame {
         controlsPanel.add(nextButton);
         controlsPanel.add(repeatButton);
 
-        JSlider songSlider = new JSlider();
+        JPanel sliderPanel = new JPanel(new BorderLayout());
+
+        songSlider = new JSlider();
+        songSlider.setEnabled(false);
+        songSlider.addMouseListener(new MouseInputListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+                JSlider slider = (JSlider) mouseEvent.getSource();
+                musicPlayer.setPosition((float) slider.getValue() / slider.getMaximum());
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent mouseEvent) {
+            }
+        });
+        songSlider.setMinimum(0);
+        songSlider.setMinimum(100);
+        songSlider.setValue(0);
+
+        songCurrentTimeLabel = new JLabel("00:00");
+        songTotalTimeLabel = new JLabel("00:00");
+
+        sliderPanel.add(songCurrentTimeLabel, BorderLayout.WEST);
+        sliderPanel.add(songSlider, BorderLayout.CENTER);
+        sliderPanel.add(songTotalTimeLabel, BorderLayout.EAST);
 
         JPanel currentSongPanel = new JPanel(new BorderLayout());
         currentSongPanel.setPreferredSize(new Dimension(500, 0));
-        currentSongPanel.add(new JLabel(scaleIcon(playIcon, 100)), BorderLayout.WEST);
 
-        JLabel currentSongInfoLabel = new JLabel(formatSongText("Title", "Artist", "Album", 5));
+        currentSongInfoLabel = new JLabel();
+        currentSongInfoLabel.setText(formatSongText("Title", "Artist", "Album", 5));
+        currentSongInfoLabel.setIcon(scaleIcon(playIcon, 100));
+        currentSongInfoLabel.setIconTextGap(10);
         currentSongInfoLabel.setFont(currentSongInfoLabel.getFont().deriveFont(25f));
         currentSongInfoLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
-        currentSongPanel.add(currentSongInfoLabel, BorderLayout.CENTER);
+        currentSongPanel.add(currentSongInfoLabel, BorderLayout.WEST);
 
         JPanel rightSouthFillerPanel = new JPanel();
         rightSouthFillerPanel.setPreferredSize(new Dimension(500, 0));
 
         southPanel.add(controlsPanel, BorderLayout.CENTER);
-        southPanel.add(songSlider, BorderLayout.NORTH);
+        southPanel.add(sliderPanel, BorderLayout.NORTH);
         southPanel.add(currentSongPanel, BorderLayout.WEST);
         southPanel.add(rightSouthFillerPanel, BorderLayout.EAST);
 

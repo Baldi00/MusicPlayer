@@ -1,6 +1,7 @@
 package org.baldelliandrea.musicplayer;
 
 import javazoom.jlgui.basicplayer.*;
+import org.baldelliandrea.ui.MusicPlayerFrame;
 
 import java.io.File;
 import java.util.Map;
@@ -12,8 +13,8 @@ public class MusicPlayer {
     private long songLengthMicroseconds;
     private int songLengthBytes;
     private long currentSongMicroseconds;
-    private int totalMinutes;
-    private int totalAdditionalSeconds;
+
+    private MusicPlayerFrame musicPlayerFrame;
 
     public MusicPlayer() {
         musicPlayer = new BasicPlayer();
@@ -30,6 +31,7 @@ public class MusicPlayer {
 
     public void play() {
         try {
+            musicPlayer.stop();
             musicPlayer.play();
             isPlaying = true;
         } catch (BasicPlayerException e) {
@@ -53,9 +55,14 @@ public class MusicPlayer {
         try {
             musicPlayer.stop();
             musicPlayer.seek((long) (songLengthBytes * percentage));
+            musicPlayer.play();
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setMusicPlayerFrame(MusicPlayerFrame musicPlayerFrame) {
+        this.musicPlayerFrame = musicPlayerFrame;
     }
 
     private void addListener() {
@@ -63,17 +70,13 @@ public class MusicPlayer {
             @Override
             public void opened(Object o, Map map) {
                 songLengthMicroseconds = (long) map.get("duration");
-                totalMinutes = (int) (songLengthMicroseconds / 1000000 / 60);
-                totalAdditionalSeconds = (int) (songLengthMicroseconds / 1000000) % 60;
                 songLengthBytes = (int) map.get("mp3.length.bytes");
             }
 
             @Override
             public void progress(int i, long l, byte[] bytes, Map map) {
                 currentSongMicroseconds = (long) map.get("mp3.position.microseconds");
-                long currentMinutes = currentSongMicroseconds / 1000000 / 60;
-                long currentSeconds = (currentSongMicroseconds / 1000000) % 60;
-                System.out.println(currentMinutes + ":" + currentSeconds + "/" + totalMinutes + ":" + totalAdditionalSeconds);
+                musicPlayerFrame.updateSlider((int) currentSongMicroseconds, (int) songLengthMicroseconds);
             }
 
             @Override

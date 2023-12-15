@@ -29,12 +29,9 @@ public class Main {
         createMediaControlWindow();
         songCacheManager = new SongCacheManager();
         loadSongList("C:\\Users\\Andrea\\Music\\Andrea");
-        MusicPlayerFrame musicPlayerFrame = new MusicPlayerFrame(songsList);
-
-
-//        musicPlayer = new MusicPlayer();
-//        musicPlayer.setMusicFilePath("Path");
-//        musicPlayer.play();
+        musicPlayer = new MusicPlayer();
+        MusicPlayerFrame musicPlayerFrame = new MusicPlayerFrame(songsList, musicPlayer);
+        musicPlayer.setMusicPlayerFrame(musicPlayerFrame);
     }
 
     private static void createMediaControlWindow() {

@@ -25,7 +25,7 @@ public class SongCacheManager {
 
     public Song getSong(String songPath, String filename) {
         if (isSongCached(filename))
-            return getCachedSong(filename);
+            return getCachedSong(songPath, filename);
         return createCacheForSong(songPath, filename);
     }
 
@@ -33,7 +33,7 @@ public class SongCacheManager {
         return new File(cacheFolderPath + "\\" + filename).exists();
     }
 
-    private Song getCachedSong(String filename) {
+    private Song getCachedSong(String songPath, String filename) {
         try {
             BufferedReader br = new BufferedReader(new FileReader(cacheFolderPath + "\\" + filename));
             String title = br.readLine();
@@ -42,7 +42,7 @@ public class SongCacheManager {
             String originalCoverPath = br.readLine();
             String coverPath100 = br.readLine();
             String coverPath45 = br.readLine();
-            return new Song(title, artist, album, filename, originalCoverPath, coverPath100, coverPath45);
+            return new Song(title, artist, album, filename, songPath, originalCoverPath, coverPath100, coverPath45);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -93,7 +93,7 @@ public class SongCacheManager {
                 bw.newLine();
                 bw.close();
 
-                return new Song(title, artist, album, filename, originalCoverPath, coverPath100, coverPath45);
+                return new Song(title, artist, album, filename, songPath, originalCoverPath, coverPath100, coverPath45);
             }
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             throw new RuntimeException(e);
