@@ -87,6 +87,7 @@ public class MusicPlayerFrame extends JFrame {
     public void updateCurrentSong(Song currentSong) {
         currentSongInfoLabel.setText(formatSongText(currentSong.getTitle(), currentSong.getArtist(), currentSong.getAlbum(), 5));
         currentSongInfoLabel.setIcon(new ImageIcon(currentSong.getCoverPath100()));
+        songSlider.setEnabled(true);
     }
 
     public void updatePlayPauseButton(boolean isPlaying) {
@@ -150,22 +151,18 @@ public class MusicPlayerFrame extends JFrame {
 
         for (Song song : songsByTitle) {
             ImageIcon cover45 = new ImageIcon(song.getCoverPath45());
-            JButton songButton = createSongButton(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 3), cover45);
-            songButton.addActionListener(actionEvent -> {
-                songSlider.setEnabled(true);
-                setupSongQueueAndPlay(song, songsQueue);
-            });
+            JButton songButton = createButton(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 3), cover45);
+            songButton.addActionListener(actionEvent -> setupSongQueueAndPlay(song, songsQueue));
             songsButtons.put(song, songButton);
         }
 
         for (Song song : songsByArtist.values()) {
-            JButton artistButton = createSongButton(song.getArtist(), null);
+            JButton artistButton = createButton(song.getArtist(), null);
             artistButton.addActionListener(actionEvent -> {
                 List<Song> songsWithArtist = new ArrayList<>();
                 for (Song s : songsByTitle)
                     if (s.getArtist().equals(song.getArtist()))
                         songsWithArtist.add(s);
-                songSlider.setEnabled(true);
                 setupSongQueueAndPlay(null, songsWithArtist);
             });
             artistsButtons.put(song.getArtist(), artistButton);
@@ -173,13 +170,12 @@ public class MusicPlayerFrame extends JFrame {
 
         for (Song song : songsByAlbum.values()) {
             ImageIcon cover45 = new ImageIcon(song.getCoverPath45());
-            JButton albumButton = createSongButton(song.getAlbum(), cover45);
+            JButton albumButton = createButton(song.getAlbum(), cover45);
             albumButton.addActionListener(actionEvent -> {
                 List<Song> songsWithAlbum = new ArrayList<>();
                 for (Song s : songsByTitle)
                     if (s.getAlbum().equals(song.getAlbum()))
                         songsWithAlbum.add(s);
-                songSlider.setEnabled(true);
                 setupSongQueueAndPlay(null, songsWithAlbum);
             });
             albumsButtons.put(song.getAlbum(), albumButton);
@@ -208,7 +204,7 @@ public class MusicPlayerFrame extends JFrame {
         queueButtonsPanel.removeAll();
         for (int i = 0; i < currentPlayingQueue.size(); i++) {
             Song s = currentPlayingQueue.get(i);
-            JButton queueButton = createSongButton(formatSongText(s.getTitle(), s.getArtist(), s.getAlbum(), 3),
+            JButton queueButton = createButton(formatSongText(s.getTitle(), s.getArtist(), s.getAlbum(), 3),
                     new ImageIcon(s.getCoverPath45()));
             int finalI = i;
             queueButton.addActionListener(actionEvent1 -> {
@@ -219,7 +215,7 @@ public class MusicPlayerFrame extends JFrame {
         validate();
     }
 
-    private JButton createSongButton(String innerText, ImageIcon icon) {
+    private JButton createButton(String innerText, ImageIcon icon) {
         JButton button = new JButton(innerText);
         if (icon != null)
             button.setIcon(icon);

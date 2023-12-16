@@ -75,6 +75,7 @@ public class MediaControlFrame extends JFrame {
     public void updateCurrentSong(Song currentSong) {
         currentSongInfoLabel.setText(formatSongText(currentSong.getTitle(), currentSong.getArtist(), currentSong.getAlbum(), 5));
         currentSongInfoLabel.setIcon(new ImageIcon(currentSong.getCoverPath100()));
+        songSlider.setEnabled(true);
     }
 
     public void updatePlayPauseButton(boolean isPlaying) {
@@ -182,6 +183,7 @@ public class MediaControlFrame extends JFrame {
         songSlider.setMinimum(0);
         songSlider.setMinimum(100);
         songSlider.setValue(0);
+        songSlider.setEnabled(false);
 
         songCurrentTimeLabel = new JLabel("00:00");
         songTotalTimeLabel = new JLabel("00:00");
