@@ -59,6 +59,7 @@ public class Main {
                     break;
                 case JIntellitype.APPCOMMAND_VOLUME_UP:
                 case JIntellitype.APPCOMMAND_VOLUME_DOWN:
+                case JIntellitype.APPCOMMAND_MEDIA_STOP:
                     mediaControlFrame.customShow();
                     break;
                 default:
