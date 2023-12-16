@@ -14,12 +14,15 @@ import java.util.TreeMap;
 import javax.swing.*;
 
 public class Main {
-    private static MediaControlFrame mediaControlFrame;
 
     private static MusicPlayer musicPlayer;
+    private static MusicPlayerFrame musicPlayerFrame;
+    private static MediaControlFrame mediaControlFrame;
 
     private static TreeMap<String, Song> songsList;
     private static SongCacheManager songCacheManager;
+
+    private static long startShowWindowTime;
 
     public static void main(String[] args) {
         registerHotkeys();
@@ -27,7 +30,7 @@ public class Main {
         songCacheManager = new SongCacheManager();
         loadSongList(System.getenv("USERPROFILE") + "\\Music");
         musicPlayer = new MusicPlayer();
-        MusicPlayerFrame musicPlayerFrame = new MusicPlayerFrame(songsList, musicPlayer);
+        musicPlayerFrame = new MusicPlayerFrame(songsList, musicPlayer);
         mediaControlFrame = new MediaControlFrame(musicPlayer);
         musicPlayer.setMusicPlayerFrame(musicPlayerFrame);
         musicPlayer.setMediaControlFrame(mediaControlFrame);
@@ -58,8 +61,16 @@ public class Main {
                     break;
                 case JIntellitype.APPCOMMAND_VOLUME_UP:
                 case JIntellitype.APPCOMMAND_VOLUME_DOWN:
-                case JIntellitype.APPCOMMAND_MEDIA_STOP:
                     mediaControlFrame.customShow();
+                    break;
+                case JIntellitype.APPCOMMAND_MEDIA_STOP:
+                    if (System.currentTimeMillis() - startShowWindowTime <= 1000) {
+                        musicPlayerFrame.setVisible(true);
+                        musicPlayerFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    } else {
+                        startShowWindowTime = System.currentTimeMillis();
+                        mediaControlFrame.customShow();
+                    }
                     break;
                 default:
                     break;

@@ -13,9 +13,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -311,7 +309,16 @@ public class MusicPlayerFrame extends JFrame {
         setSize(1920, 1080);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowIconified(WindowEvent e) {
+                setVisible(false);
+            }
+        });
+
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(getSpriteResource("musicPlayerIcon64.png").getImage());
         setVisible(true);
     }
 
