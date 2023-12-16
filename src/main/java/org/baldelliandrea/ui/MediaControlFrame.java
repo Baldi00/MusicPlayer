@@ -16,6 +16,8 @@ import java.util.MissingResourceException;
 
 public class MediaControlFrame extends JFrame {
 
+    private static final float MEDIA_CONTROL_WIDGET_DELAY = 3f;
+
     private MusicPlayer musicPlayer;
 
     private ImageIcon playIcon;
@@ -32,6 +34,8 @@ public class MediaControlFrame extends JFrame {
     private JLabel songCurrentTimeLabel;
     private JLabel songTotalTimeLabel;
 
+    private HideWindowDelayedThread hideWindowDelayedThread;
+
     public MediaControlFrame(MusicPlayer musicPlayer) {
         this.musicPlayer = musicPlayer;
 
@@ -43,6 +47,15 @@ public class MediaControlFrame extends JFrame {
         setType(JFrame.Type.UTILITY);
         setAlwaysOnTop(true);
         add(createMediaPanel());
+    }
+
+    public void customShow() {
+        if (hideWindowDelayedThread != null)
+            hideWindowDelayedThread.interrupt();
+
+        setVisible(true);
+        hideWindowDelayedThread = new HideWindowDelayedThread(this, MEDIA_CONTROL_WIDGET_DELAY);
+        hideWindowDelayedThread.start();
     }
 
     public void updateSlider(int value, int max) {
@@ -89,11 +102,20 @@ public class MediaControlFrame extends JFrame {
 
     private void createControlButtons() {
         playButton = createControlButton(playIcon, 60);
-        playButton.addActionListener(actionEvent -> musicPlayer.togglePlayPause());
+        playButton.addActionListener(actionEvent -> {
+            musicPlayer.togglePlayPause();
+            customShow();
+        });
         prevButton = createControlButton(prevIcon, 40);
-        prevButton.addActionListener(actionEvent -> musicPlayer.prevPositionInSongQueue());
+        prevButton.addActionListener(actionEvent -> {
+            musicPlayer.prevPositionInSongQueue();
+            customShow();
+        });
         nextButton = createControlButton(nextIcon, 40);
-        nextButton.addActionListener(actionEvent -> musicPlayer.nextPositionInSongQueue());
+        nextButton.addActionListener(actionEvent -> {
+            musicPlayer.nextPositionInSongQueue();
+            customShow();
+        });
     }
 
     private JButton createControlButton(ImageIcon icon, int size) {
@@ -127,8 +149,10 @@ public class MediaControlFrame extends JFrame {
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 JSlider slider = (JSlider) mouseEvent.getSource();
-                if (slider.isEnabled())
-                    musicPlayer.setPosition((float) slider.getValue() / slider.getMaximum());
+                if (slider.isEnabled()) {
+                    musicPlayer.setPosition((float) (mouseEvent.getXOnScreen() - slider.getLocationOnScreen().x) / slider.getSize().width);
+                    customShow();
+                }
             }
 
             @Override
@@ -167,6 +191,36 @@ public class MediaControlFrame extends JFrame {
         currentSongInfoLabel.setIconTextGap(10);
         currentSongInfoLabel.setFont(currentSongInfoLabel.getFont().deriveFont(25f));
         currentSongInfoLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
+        currentSongInfoLabel.addMouseListener(new MouseInputListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                customHide();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent mouseEvent) {
+            }
+        });
         currentSongPanel.add(currentSongInfoLabel, BorderLayout.WEST);
 
         mediaPanel.add(currentSongPanel, BorderLayout.WEST);
@@ -183,5 +237,12 @@ public class MediaControlFrame extends JFrame {
     private String formatSongText(String title, String artist, String album, int size) {
         return "<html>" + title + "<br><font size=\"" + size + "\" color=\"gray\">" + artist +
                 " • " + album + "</font></html>";
+    }
+
+    private void customHide() {
+        if (hideWindowDelayedThread != null)
+            hideWindowDelayedThread.interrupt();
+
+        setVisible(false);
     }
 }

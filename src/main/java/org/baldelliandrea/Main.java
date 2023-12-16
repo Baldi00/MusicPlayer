@@ -5,7 +5,6 @@ import com.melloware.jintellitype.JIntellitype;
 import org.baldelliandrea.musicplayer.MusicPlayer;
 import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongCacheManager;
-import org.baldelliandrea.ui.HideWindowDelayedThread;
 import org.baldelliandrea.ui.MediaControlFrame;
 import org.baldelliandrea.ui.MusicPlayerFrame;
 
@@ -16,10 +15,7 @@ import java.util.TreeMap;
 import javax.swing.*;
 
 public class Main {
-    private static final float MEDIA_CONTROL_WIDGET_DELAY = 3f;
-
     private static MediaControlFrame mediaControlFrame;
-    private static HideWindowDelayedThread hideWindowDelayedThread;
 
     private static MusicPlayer musicPlayer;
 
@@ -38,17 +34,6 @@ public class Main {
         musicPlayer.setMediaControlFrame(mediaControlFrame);
     }
 
-    private static void showMediaControlWindow() {
-        EventQueue.invokeLater(() -> {
-            if (hideWindowDelayedThread != null)
-                hideWindowDelayedThread.interrupt();
-
-            mediaControlFrame.setVisible(true);
-            hideWindowDelayedThread = new HideWindowDelayedThread(mediaControlFrame, MEDIA_CONTROL_WIDGET_DELAY);
-            hideWindowDelayedThread.start();
-        });
-    }
-
     private static void setLookAndFeel() {
         try {
             UIManager.setLookAndFeel(new FlatMacDarkLaf());
@@ -62,19 +47,19 @@ public class Main {
             switch (command) {
                 case JIntellitype.APPCOMMAND_MEDIA_PLAY_PAUSE:
                     musicPlayer.togglePlayPause();
-                    showMediaControlWindow();
+                    mediaControlFrame.customShow();
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
                     musicPlayer.nextPositionInSongQueue();
-                    showMediaControlWindow();
+                    mediaControlFrame.customShow();
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_PREVIOUSTRACK:
                     musicPlayer.prevPositionInSongQueue();
-                    showMediaControlWindow();
+                    mediaControlFrame.customShow();
                     break;
                 case JIntellitype.APPCOMMAND_VOLUME_UP:
                 case JIntellitype.APPCOMMAND_VOLUME_DOWN:
-                    showMediaControlWindow();
+                    mediaControlFrame.customShow();
                     break;
                 default:
                     break;
