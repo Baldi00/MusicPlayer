@@ -13,6 +13,7 @@ import java.util.Map;
 public class MusicPlayer {
     private final BasicPlayer musicPlayer;
     private boolean isPlaying;
+    private boolean isSongSelected;
 
     private long songLengthMicroseconds;
     private int songLengthBytes;
@@ -35,24 +36,16 @@ public class MusicPlayer {
     public void setMusicFilePath(String path) {
         try {
             musicPlayer.open(new File(path));
-        } catch (BasicPlayerException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void play() {
-        try {
-            musicPlayer.stop();
-            musicPlayer.play();
-            isPlaying = true;
-            musicPlayerFrame.updatePlayPauseButton(true);
-            mediaControlFrame.updatePlayPauseButton(true);
+            isSongSelected = true;
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void togglePlayPause() {
+        if (!isSongSelected)
+            return;
+
         try {
             if (isPlaying)
                 musicPlayer.pause();
@@ -67,6 +60,9 @@ public class MusicPlayer {
     }
 
     public void setPosition(float percentage) {
+        if (!isSongSelected)
+            return;
+
         try {
             musicPlayer.stop();
             musicPlayer.seek((long) (songLengthBytes * percentage));
@@ -104,6 +100,9 @@ public class MusicPlayer {
     }
 
     public void nextPositionInSongQueue() {
+        if (!isSongSelected)
+            return;
+
         switch (repeatMode) {
             case REPEAT:
                 setPositionInSongQueue(songsQueuePosition + 1);
@@ -126,6 +125,9 @@ public class MusicPlayer {
     }
 
     public void prevPositionInSongQueue() {
+        if (!isSongSelected)
+            return;
+
         setPositionInSongQueue(songsQueuePosition - 1);
     }
 
@@ -148,9 +150,24 @@ public class MusicPlayer {
     }
 
     public Song getCurrentPlayingSong() {
-        if (songsQueue == null)
+        if (songsQueue == null || !isSongSelected)
             return null;
         return songsQueue.get(songsQueuePosition);
+    }
+
+    private void play() {
+        if (!isSongSelected)
+            return;
+        
+        try {
+            musicPlayer.stop();
+            musicPlayer.play();
+            isPlaying = true;
+            musicPlayerFrame.updatePlayPauseButton(true);
+            mediaControlFrame.updatePlayPauseButton(true);
+        } catch (BasicPlayerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void addListener() {
