@@ -37,6 +37,7 @@ public class MusicPlayerFrame extends JFrame {
     private Map<Song, JButton> songsButtons;
     private Map<String, JButton> artistsButtons;
     private Map<String, JButton> albumsButtons;
+    private Map<Song, JButton> queueButtons;
 
     private ImageIcon playIcon;
     private ImageIcon pauseIcon;
@@ -65,6 +66,7 @@ public class MusicPlayerFrame extends JFrame {
 
         playlistButtons = new ArrayList<>();
         songsQueue = new ArrayList<>();
+        queueButtons = new HashMap<>();
         loadControlsSprites();
         createTitleArtistAlbumButtons();
         createPlaylistsButtons();
@@ -90,6 +92,11 @@ public class MusicPlayerFrame extends JFrame {
         currentSongInfoLabel.setText(formatSongText(currentSong.getTitle(), currentSong.getArtist(), currentSong.getAlbum(), 5));
         currentSongInfoLabel.setIcon(new ImageIcon(currentSong.getCoverPath100()));
         songSlider.setEnabled(true);
+
+        for (JButton songButton : queueButtons.values())
+            songButton.setForeground(Color.WHITE);
+
+        queueButtons.get(currentSong).setForeground(new Color(47, 174, 255));
     }
 
     public void updatePlayPauseButton(boolean isPlaying) {
@@ -242,10 +249,8 @@ public class MusicPlayerFrame extends JFrame {
                 currentPlayingQueue.add(s);
             }
 
-        musicPlayer.setSongsQueue(currentPlayingQueue);
-        musicPlayer.setPositionInSongQueue(0);
-
         queueButtonsPanel.removeAll();
+        queueButtons.clear();
         for (int i = 0; i < currentPlayingQueue.size(); i++) {
             Song s = currentPlayingQueue.get(i);
             JButton queueButton = createButton(formatSongText(s.getTitle(), s.getArtist(), s.getAlbum(), 3),
@@ -254,9 +259,13 @@ public class MusicPlayerFrame extends JFrame {
             queueButton.addActionListener(actionEvent1 -> {
                 musicPlayer.setPositionInSongQueue(finalI);
             });
+            queueButtons.put(s, queueButton);
             queueButtonsPanel.add(queueButton);
         }
         validate();
+
+        musicPlayer.setSongsQueue(currentPlayingQueue);
+        musicPlayer.setPositionInSongQueue(0);
     }
 
     private JButton createButton(String innerText, ImageIcon icon) {
