@@ -3,6 +3,8 @@ package org.baldelliandrea.ui;
 import org.baldelliandrea.musicplayer.MusicPlayer;
 import org.baldelliandrea.musicplayer.RepeatMode;
 import org.baldelliandrea.song.Song;
+import org.baldelliandrea.song.SongCreationTimeComparator;
+import org.baldelliandrea.song.SongLastModifiedComparator;
 import org.baldelliandrea.song.SongTitleComparator;
 
 import javax.imageio.ImageIO;
@@ -66,6 +68,7 @@ public class MusicPlayerFrame extends JFrame {
         songsQueue = new ArrayList<>();
         loadControlsSprites();
         createTitleArtistAlbumButtons();
+        createPlaylistsButtons();
         createControlButtons();
         createAndShowWindow();
     }
@@ -179,6 +182,39 @@ public class MusicPlayerFrame extends JFrame {
                 setupSongQueueAndPlay(null, songsWithAlbum);
             });
             albumsButtons.put(song.getAlbum(), albumButton);
+        }
+    }
+
+    private void createPlaylistsButtons() {
+        playlistButtons = new ArrayList<>();
+
+        // Sort by
+        List<Song> creationTimeSongs = new ArrayList<>(songsList.values());
+        List<Song> lastModifiedSongs = new ArrayList<>(songsList.values());
+
+        creationTimeSongs.sort(new SongCreationTimeComparator());
+        lastModifiedSongs.sort(new SongLastModifiedComparator());
+
+        JButton creationTimeButton = createButton("Sort by: Creation Date", null);
+        creationTimeButton.addActionListener(actionEvent -> setupSongQueueAndPlay(null, creationTimeSongs));
+        playlistButtons.add(creationTimeButton);
+
+        JButton lastModifiedButton = createButton("Sort by: Last Modified", null);
+        lastModifiedButton.addActionListener(actionEvent -> setupSongQueueAndPlay(null, lastModifiedSongs));
+        playlistButtons.add(lastModifiedButton);
+
+        // Genres
+        Map<String, List<Song>> songsGroupedByGenre = new TreeMap<>();
+        for (Song song : songsList.values()) {
+            if (!songsGroupedByGenre.containsKey(song.getGenre()))
+                songsGroupedByGenre.put(song.getGenre(), new ArrayList<>());
+            songsGroupedByGenre.get(song.getGenre()).add(song);
+        }
+
+        for (String genre : songsGroupedByGenre.keySet()) {
+            JButton genreButton = createButton("Genre: " + genre, null);
+            genreButton.addActionListener(actionEvent -> setupSongQueueAndPlay(null, songsGroupedByGenre.get(genre)));
+            playlistButtons.add(genreButton);
         }
     }
 
