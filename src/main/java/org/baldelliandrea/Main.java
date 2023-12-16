@@ -26,7 +26,7 @@ public class Main {
         registerHotkeys();
         setLookAndFeel();
         songCacheManager = new SongCacheManager();
-        loadSongList("C:\\Users\\Andrea\\Music\\Andrea");
+        loadSongList(System.getenv("USERPROFILE") + "\\Music");
         musicPlayer = new MusicPlayer();
         MusicPlayerFrame musicPlayerFrame = new MusicPlayerFrame(songsList, musicPlayer);
         mediaControlFrame = new MediaControlFrame(musicPlayer);
