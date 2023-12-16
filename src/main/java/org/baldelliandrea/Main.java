@@ -66,6 +66,7 @@ public class Main {
                 case JIntellitype.APPCOMMAND_MEDIA_STOP:
                     if (System.currentTimeMillis() - startShowWindowTime <= 1000) {
                         musicPlayerFrame.toggleVisibility();
+                        mediaControlFrame.customHide();
                     } else {
                         startShowWindowTime = System.currentTimeMillis();
                         mediaControlFrame.customShow();

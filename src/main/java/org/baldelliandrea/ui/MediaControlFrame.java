@@ -83,6 +83,13 @@ public class MediaControlFrame extends JFrame {
         playButton.setIcon(scaleIcon(icon, 60));
     }
 
+    public void customHide() {
+        if (hideWindowDelayedThread != null)
+            hideWindowDelayedThread.interrupt();
+
+        setVisible(false);
+    }
+
     private void loadControlsSprites() {
         playIcon = getSpriteResource("controls/play-circle.png");
         pauseIcon = getSpriteResource("controls/pause-circle.png");
@@ -247,12 +254,5 @@ public class MediaControlFrame extends JFrame {
     private String formatSongText(String title, String artist, String album, int size) {
         return "<html>" + title + "<br><font size=\"" + size + "\" color=\"gray\">" + artist +
                 " • " + album + "</font></html>";
-    }
-
-    private void customHide() {
-        if (hideWindowDelayedThread != null)
-            hideWindowDelayedThread.interrupt();
-
-        setVisible(false);
     }
 }
