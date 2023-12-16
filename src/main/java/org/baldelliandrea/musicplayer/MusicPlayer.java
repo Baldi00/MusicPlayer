@@ -71,6 +71,9 @@ public class MusicPlayer {
             musicPlayer.stop();
             musicPlayer.seek((long) (songLengthBytes * percentage));
             musicPlayer.play();
+            isPlaying = true;
+            musicPlayerFrame.updatePlayPauseButton(true);
+            mediaControlFrame.updatePlayPauseButton(true);
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
@@ -126,10 +129,6 @@ public class MusicPlayer {
         setPositionInSongQueue(songsQueuePosition - 1);
     }
 
-    public boolean isPlaying() {
-        return isPlaying;
-    }
-
     public void setRepeatMode(RepeatMode repeatMode) {
         this.repeatMode = repeatMode;
         musicPlayerFrame.updateRepeatButton(repeatMode);
@@ -149,7 +148,7 @@ public class MusicPlayer {
     }
 
     public Song getCurrentPlayingSong() {
-        if(songsQueue == null)
+        if (songsQueue == null)
             return null;
         return songsQueue.get(songsQueuePosition);
     }
