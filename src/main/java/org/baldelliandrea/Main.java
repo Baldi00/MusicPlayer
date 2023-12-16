@@ -65,8 +65,7 @@ public class Main {
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_STOP:
                     if (System.currentTimeMillis() - startShowWindowTime <= 1000) {
-                        musicPlayerFrame.setVisible(true);
-                        musicPlayerFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                        musicPlayerFrame.toggleVisibility();
                     } else {
                         startShowWindowTime = System.currentTimeMillis();
                         mediaControlFrame.customShow();

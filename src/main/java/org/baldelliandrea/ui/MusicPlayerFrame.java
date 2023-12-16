@@ -125,6 +125,15 @@ public class MusicPlayerFrame extends JFrame {
         shuffleButton.setIcon(scaleIcon(icon, 20));
     }
 
+    public void toggleVisibility() {
+        if (isVisible())
+            setVisible(false);
+        else {
+            setVisible(true);
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+    }
+
     private void loadControlsSprites() {
         playIcon = getSpriteResource("controls/play-circle.png");
         pauseIcon = getSpriteResource("controls/pause-circle.png");
