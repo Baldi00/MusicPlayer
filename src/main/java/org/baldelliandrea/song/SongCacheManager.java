@@ -16,9 +16,13 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class SongCacheManager {
-    private final String cacheFolderPath = "cache";
+    private final String programDataFolderPath = System.getenv("APPDATA") + "\\BaldelliMusicPlayer";
+    private final String cacheFolderPath = System.getenv("APPDATA") + "\\BaldelliMusicPlayer\\cache";
 
     public SongCacheManager() {
+        File programDataFolder = new File(programDataFolderPath);
+        if (!programDataFolder.exists())
+            programDataFolder.mkdir();
         File cacheFolder = new File(cacheFolderPath);
         if (!cacheFolder.exists())
             cacheFolder.mkdir();

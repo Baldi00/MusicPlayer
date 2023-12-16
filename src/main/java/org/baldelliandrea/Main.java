@@ -8,7 +8,6 @@ import org.baldelliandrea.song.SongCacheManager;
 import org.baldelliandrea.ui.MediaControlFrame;
 import org.baldelliandrea.ui.MusicPlayerFrame;
 
-import java.awt.*;
 import java.io.File;
 import java.util.Objects;
 import java.util.TreeMap;
