@@ -2,6 +2,7 @@ package org.baldelliandrea.ui;
 
 import org.baldelliandrea.musicplayer.MusicPlayer;
 import org.baldelliandrea.musicplayer.RepeatMode;
+import org.baldelliandrea.playlist.PlaylistManager;
 import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongCreationTimeComparator;
 import org.baldelliandrea.song.SongLastModifiedComparator;
@@ -215,6 +216,15 @@ public class MusicPlayerFrame extends JFrame {
             JButton genreButton = createButton("Genre: " + genre, null);
             genreButton.addActionListener(actionEvent -> setupSongQueueAndPlay(null, songsGroupedByGenre.get(genre)));
             playlistButtons.add(genreButton);
+        }
+
+        // Playlists
+        Map<String, List<Song>> songGroupedByPlaylist = PlaylistManager.getPlaylists();
+
+        for (String playlist : songGroupedByPlaylist.keySet()) {
+            JButton playlistButton = createButton(playlist, null);
+            playlistButton.addActionListener(actionEvent -> setupSongQueueAndPlay(null, songGroupedByPlaylist.get(playlist)));
+            playlistButtons.add(playlistButton);
         }
     }
 

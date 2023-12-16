@@ -158,7 +158,7 @@ public class MusicPlayer {
     private void play() {
         if (!isSongSelected)
             return;
-        
+
         try {
             musicPlayer.stop();
             musicPlayer.play();
