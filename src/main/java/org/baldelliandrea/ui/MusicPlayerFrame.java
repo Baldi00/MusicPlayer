@@ -162,8 +162,8 @@ public class MusicPlayerFrame extends JFrame {
             JButton artistButton = createSongButton(song.getArtist(), null);
             artistButton.addActionListener(actionEvent -> {
                 List<Song> songsWithArtist = new ArrayList<>();
-                for(Song s : songsByTitle)
-                    if(s.getArtist().equals(song.getArtist()))
+                for (Song s : songsByTitle)
+                    if (s.getArtist().equals(song.getArtist()))
                         songsWithArtist.add(s);
                 songSlider.setEnabled(true);
                 setupSongQueueAndPlay(null, songsWithArtist);
@@ -176,8 +176,8 @@ public class MusicPlayerFrame extends JFrame {
             JButton albumButton = createSongButton(song.getAlbum(), cover45);
             albumButton.addActionListener(actionEvent -> {
                 List<Song> songsWithAlbum = new ArrayList<>();
-                for(Song s : songsByTitle)
-                    if(s.getAlbum().equals(song.getAlbum()))
+                for (Song s : songsByTitle)
+                    if (s.getAlbum().equals(song.getAlbum()))
                         songsWithAlbum.add(s);
                 songSlider.setEnabled(true);
                 setupSongQueueAndPlay(null, songsWithAlbum);

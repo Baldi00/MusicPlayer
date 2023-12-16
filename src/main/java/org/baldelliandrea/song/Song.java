@@ -55,6 +55,27 @@ public class Song implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        return title.compareTo(((Song) o).title);
+        int titleCompare = title.compareTo(((Song) o).title);
+        int artistCompare = artist.compareTo(((Song) o).artist);
+        int albumCompare = album.compareTo(((Song) o).album);
+        if (titleCompare != 0)
+            return titleCompare;
+        else if (artistCompare != 0)
+            return artistCompare;
+        return albumCompare;
+    }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", album='" + album + '\'' +
+                ", filename='" + filename + '\'' +
+                ", path='" + path + '\'' +
+                ", originalCoverPath='" + originalCoverPath + '\'' +
+                ", coverPath100='" + coverPath100 + '\'' +
+                ", coverPath45='" + coverPath45 + '\'' +
+                '}';
     }
 }
