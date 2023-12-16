@@ -85,14 +85,18 @@ public class Song implements Comparable {
     public int compareTo(Object o) {
         if (title.startsWith("[") && !((Song) o).title.startsWith("["))
             return 1;
+        if (!title.startsWith("[") && ((Song) o).title.startsWith("["))
+            return -1;
+
         int titleCompare = title.toLowerCase().compareTo(((Song) o).title.toLowerCase());
-        int artistCompare = artist.toLowerCase().compareTo(((Song) o).artist.toLowerCase());
-        int albumCompare = album.toLowerCase().compareTo(((Song) o).album.toLowerCase());
         if (titleCompare != 0)
             return titleCompare;
-        else if (artistCompare != 0)
+
+        int artistCompare = artist.toLowerCase().compareTo(((Song) o).artist.toLowerCase());
+        if (artistCompare != 0)
             return artistCompare;
-        return albumCompare;
+
+        return album.toLowerCase().compareTo(((Song) o).album.toLowerCase());
     }
 
     @Override
