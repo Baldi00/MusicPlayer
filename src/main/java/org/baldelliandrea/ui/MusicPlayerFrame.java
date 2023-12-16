@@ -266,7 +266,7 @@ public class MusicPlayerFrame extends JFrame {
         add(centralPanel, BorderLayout.CENTER);
         add(southPanel, BorderLayout.SOUTH);
 
-        setSize(1920,1080);
+        setSize(1920, 1080);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -367,8 +367,9 @@ public class MusicPlayerFrame extends JFrame {
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 JSlider slider = (JSlider) mouseEvent.getSource();
+
                 if (slider.isEnabled())
-                    musicPlayer.setPosition((float) slider.getValue() / slider.getMaximum());
+                    musicPlayer.setPosition((float) (mouseEvent.getXOnScreen() - slider.getLocationOnScreen().x) / slider.getSize().width);
             }
 
             @Override
