@@ -368,8 +368,11 @@ public class MusicPlayerFrame extends JFrame {
             public void mouseReleased(MouseEvent mouseEvent) {
                 JSlider slider = (JSlider) mouseEvent.getSource();
 
-                if (slider.isEnabled())
-                    musicPlayer.setPosition((float) (mouseEvent.getXOnScreen() - slider.getLocationOnScreen().x) / slider.getSize().width);
+                if (slider.isEnabled()) {
+                    float percentage = (float) (mouseEvent.getXOnScreen() - slider.getLocationOnScreen().x) / slider.getSize().width;
+                    musicPlayer.setPosition(percentage);
+                    slider.setValue((int) (percentage * slider.getMaximum()));
+                }
             }
 
             @Override

@@ -140,35 +140,43 @@ public class MediaControlFrame extends JFrame {
         songSlider.addMouseListener(new MouseInputListener() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
+                customShow();
             }
 
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
+                customShow();
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 JSlider slider = (JSlider) mouseEvent.getSource();
                 if (slider.isEnabled()) {
-                    musicPlayer.setPosition((float) (mouseEvent.getXOnScreen() - slider.getLocationOnScreen().x) / slider.getSize().width);
+                    float percentage = (float) (mouseEvent.getXOnScreen() - slider.getLocationOnScreen().x) / slider.getSize().width;
+                    musicPlayer.setPosition(percentage);
+                    slider.setValue((int) (percentage * slider.getMaximum()));
                     customShow();
                 }
             }
 
             @Override
             public void mouseEntered(MouseEvent mouseEvent) {
+                customShow();
             }
 
             @Override
             public void mouseExited(MouseEvent mouseEvent) {
+                customShow();
             }
 
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
+                customShow();
             }
 
             @Override
             public void mouseMoved(MouseEvent mouseEvent) {
+                customShow();
             }
         });
         songSlider.setMinimum(0);
