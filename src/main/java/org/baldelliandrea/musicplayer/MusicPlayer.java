@@ -67,9 +67,8 @@ public class MusicPlayer {
             musicPlayer.stop();
             musicPlayer.seek((long) (songLengthBytes * percentage));
             musicPlayer.play();
-            isPlaying = true;
-            musicPlayerFrame.updatePlayPauseButton(true);
-            mediaControlFrame.updatePlayPauseButton(true);
+            if (!isPlaying)
+                musicPlayer.pause();
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
