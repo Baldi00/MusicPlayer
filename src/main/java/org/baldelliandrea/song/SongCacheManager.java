@@ -13,6 +13,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 
 public class SongCacheManager {
     private final String cacheFolderPath = "cache";
@@ -39,10 +40,12 @@ public class SongCacheManager {
             String title = br.readLine();
             String artist = br.readLine();
             String album = br.readLine();
-            String originalCoverPath = br.readLine();
+            String genre = br.readLine();
             String coverPath100 = br.readLine();
             String coverPath45 = br.readLine();
-            return new Song(title, artist, album, filename, songPath, originalCoverPath, coverPath100, coverPath45);
+            long creationTime = Files.readAttributes(new File(songPath).toPath(), BasicFileAttributes.class).creationTime().toMillis();
+            long lastModified = new File(songPath).lastModified();
+            return new Song(title, artist, album, genre, filename, songPath, coverPath100, coverPath45, creationTime, lastModified);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -56,26 +59,27 @@ public class SongCacheManager {
                 String title = id3v2Tag.getTitle();
                 String artist = id3v2Tag.getArtist();
                 String album = id3v2Tag.getAlbum();
+                String genre = id3v2Tag.getGenreDescription();
 
                 title = title == null ? "No title" : title;
                 artist = artist == null ? "No artist" : artist;
                 album = album == null ? "No album" : album;
+                genre = genre == null ? "No genre" : genre;
 
-                String originalCoverPath = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + ".jpg";
                 String coverPath100 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "100.jpg";
                 String coverPath45 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "45.jpg";
 
-                File originalCover = new File(originalCoverPath);
                 File cover100 = new File(coverPath100);
                 File cover45 = new File(coverPath45);
 
                 ImageIcon cover = new ImageIcon(id3v2Tag.getAlbumImage());
-                if (!originalCover.exists())
-                    ImageIO.write(getBufferedImage(cover), "jpg", Files.newOutputStream(Paths.get(originalCoverPath)));
                 if (!cover100.exists())
                     ImageIO.write(resizeImageSmooth(cover.getImage(), 100, 100), "jpg", Files.newOutputStream(Paths.get(coverPath100)));
                 if (!cover45.exists())
                     ImageIO.write(resizeImageSmooth(cover.getImage(), 45, 45), "jpg", Files.newOutputStream(Paths.get(coverPath45)));
+
+                long creationTime = Files.readAttributes(new File(songPath).toPath(), BasicFileAttributes.class).creationTime().toMillis();
+                long lastModified = new File(songPath).lastModified();
 
                 File tagCache = new File(cacheFolderPath + "\\" + filename);
                 BufferedWriter bw = new BufferedWriter(new FileWriter(tagCache));
@@ -85,7 +89,7 @@ public class SongCacheManager {
                 bw.newLine();
                 bw.write(album);
                 bw.newLine();
-                bw.write(originalCoverPath);
+                bw.write(genre);
                 bw.newLine();
                 bw.write(coverPath100);
                 bw.newLine();
@@ -93,7 +97,7 @@ public class SongCacheManager {
                 bw.newLine();
                 bw.close();
 
-                return new Song(title, artist, album, filename, songPath, originalCoverPath, coverPath100, coverPath45);
+                return new Song(title, artist, album, genre, filename, songPath, coverPath100, coverPath45, creationTime, lastModified);
             }
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             throw new RuntimeException(e);
@@ -106,16 +110,6 @@ public class SongCacheManager {
         final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         final Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.drawImage(resized.getImage(), 0, 0, width, height, null);
-        graphics2D.dispose();
-        return bufferedImage;
-    }
-
-    private BufferedImage getBufferedImage(final ImageIcon image) {
-        int width = image.getIconWidth();
-        int height = image.getIconHeight();
-        final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        final Graphics2D graphics2D = bufferedImage.createGraphics();
-        graphics2D.drawImage(image.getImage(), 0, 0, width, height, null);
         graphics2D.dispose();
         return bufferedImage;
     }

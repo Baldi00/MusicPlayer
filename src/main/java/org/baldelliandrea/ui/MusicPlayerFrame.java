@@ -453,9 +453,7 @@ public class MusicPlayerFrame extends JFrame {
 
         songsQueue.clear();
         for (Song song : songsButtons.keySet())
-            if (song.getTitle().toLowerCase().contains(searchInput) ||
-                    song.getArtist().toLowerCase().contains(searchInput) ||
-                    song.getAlbum().toLowerCase().contains(searchInput)) {
+            if (song.contains(searchInput)) {
                 songsButtonsPanel.add(songsButtons.get(song));
                 songsQueue.add(song);
             }
