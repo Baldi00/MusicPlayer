@@ -96,7 +96,7 @@ public class MusicPlayerFrame extends JFrame {
         for (JButton songButton : queueButtons.values())
             songButton.setForeground(Color.WHITE);
 
-        queueButtons.get(currentSong).setForeground(new Color(47, 174, 255));
+        queueButtons.get(currentSong).setForeground(new Color(0, 128, 255));
     }
 
     public void updatePlayPauseButton(boolean isPlaying) {
