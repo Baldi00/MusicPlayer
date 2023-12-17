@@ -88,7 +88,7 @@ public class Main {
             for (File file : Objects.requireNonNull(startFolder.listFiles())) {
                 if (file.isDirectory())
                     loadSongListRecursive(file);
-                else if (file.isFile() && file.getName().endsWith(".mp3"))
+                else if (file.isFile() && file.getName().toLowerCase().endsWith(".mp3"))
                     songsList.put(file.getName(), songCacheManager.getSong(file.getAbsolutePath(), file.getName()));
             }
         }
