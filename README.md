@@ -1,6 +1,8 @@
 # Music Player
 Since Microsoft made its Groove a non-working crap I decided to create my own music player
 
+⚠ Use the Stop button on your keyboard to toggle the main window visibility
+
 <img src="screenshot.png">
 
 ## Limitations
