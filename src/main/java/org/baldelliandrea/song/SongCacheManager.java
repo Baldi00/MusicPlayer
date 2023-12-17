@@ -49,6 +49,7 @@ public class SongCacheManager {
             String coverPath45 = br.readLine();
             long creationTime = Files.readAttributes(new File(songPath).toPath(), BasicFileAttributes.class).creationTime().toMillis();
             long lastModified = new File(songPath).lastModified();
+            br.close();
             return new Song(title, artist, album, genre, filename, songPath, coverPath100, coverPath45, creationTime, lastModified);
         } catch (IOException e) {
             throw new RuntimeException(e);
