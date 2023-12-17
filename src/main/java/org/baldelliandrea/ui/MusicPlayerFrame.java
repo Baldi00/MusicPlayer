@@ -129,6 +129,7 @@ public class MusicPlayerFrame extends JFrame {
         if (isVisible())
             setVisible(false);
         else {
+            setState(Frame.NORMAL);
             setVisible(true);
             toFront();
             requestFocus();
