@@ -25,7 +25,7 @@ public class PlaylistManager {
             List<Song> songsList = new ArrayList<>();
             for (String songPath : getPlaylistSongsPaths(playlistPath)) {
                 File songFile = new File(songPath);
-                if(!songFile.getName().endsWith(".mp3"))
+                if(!songFile.getName().toLowerCase().endsWith(".mp3"))
                     continue;
                 songsList.add(songCacheManager.getSong(songFile.getAbsolutePath(), songFile.getName()));
             }
