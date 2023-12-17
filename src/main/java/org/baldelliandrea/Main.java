@@ -15,6 +15,8 @@ import javax.swing.*;
 
 public class Main {
 
+    private static final int DOUBLE_CLICK_MAX_DELAY = 250;
+
     private static MusicPlayer musicPlayer;
     private static MusicPlayerFrame musicPlayerFrame;
     private static MediaControlFrame mediaControlFrame;
@@ -64,7 +66,7 @@ public class Main {
                     mediaControlFrame.customShow();
                     break;
                 case JIntellitype.APPCOMMAND_MEDIA_STOP:
-                    if (System.currentTimeMillis() - startShowWindowTime <= 1000) {
+                    if (System.currentTimeMillis() - startShowWindowTime <= DOUBLE_CLICK_MAX_DELAY) {
                         musicPlayerFrame.toggleVisibility();
                         mediaControlFrame.customHide();
                     } else {
