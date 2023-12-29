@@ -7,6 +7,7 @@ import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongCreationTimeComparator;
 import org.baldelliandrea.song.SongLastModifiedComparator;
 import org.baldelliandrea.song.SongTitleComparator;
+import org.baldelliandrea.utils.MusicPlayerUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -137,15 +138,15 @@ public class MusicPlayerFrame extends JFrame {
     }
 
     private void loadControlsSprites() {
-        playIcon = getSpriteResource("controls/play-circle.png");
-        pauseIcon = getSpriteResource("controls/pause-circle.png");
-        prevIcon = getSpriteResource("controls/rewind-circle.png");
-        nextIcon = getSpriteResource("controls/fast-forward-circle.png");
-        shuffleIcon = getSpriteResource("controls/shuffle.png");
-        shuffleOffIcon = getSpriteResource("controls/shuffle-off.png");
-        repeatIcon = getSpriteResource("controls/repeat.png");
-        repeat1Icon = getSpriteResource("controls/repeat-1.png");
-        repeatOffIcon = getSpriteResource("controls/repeat-off.png");
+        playIcon = MusicPlayerUtils.getSpriteResource("controls/play-circle.png");
+        pauseIcon = MusicPlayerUtils.getSpriteResource("controls/pause-circle.png");
+        prevIcon = MusicPlayerUtils.getSpriteResource("controls/rewind-circle.png");
+        nextIcon = MusicPlayerUtils.getSpriteResource("controls/fast-forward-circle.png");
+        shuffleIcon = MusicPlayerUtils.getSpriteResource("controls/shuffle.png");
+        shuffleOffIcon = MusicPlayerUtils.getSpriteResource("controls/shuffle-off.png");
+        repeatIcon = MusicPlayerUtils.getSpriteResource("controls/repeat.png");
+        repeat1Icon = MusicPlayerUtils.getSpriteResource("controls/repeat-1.png");
+        repeatOffIcon = MusicPlayerUtils.getSpriteResource("controls/repeat-off.png");
     }
 
     private void createTitleArtistAlbumButtons() {
@@ -338,7 +339,7 @@ public class MusicPlayerFrame extends JFrame {
         });
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setIconImage(getSpriteResource("musicPlayerIcon64.png").getImage());
+        setIconImage(MusicPlayerUtils.getSpriteResource("musicPlayerIcon64.png").getImage());
         setVisible(true);
     }
 
@@ -491,17 +492,6 @@ public class MusicPlayerFrame extends JFrame {
         southPanel.add(rightSouthFillerPanel, BorderLayout.EAST);
 
         return southPanel;
-    }
-
-    private ImageIcon getSpriteResource(String path) {
-        try (InputStream stream = MusicPlayerFrame.class.getClassLoader().getResourceAsStream(path)) {
-            if (stream == null)
-                throw new MissingResourceException("Resource cannot be found", MusicPlayerFrame.class.getName(), path);
-            BufferedImage bufferedImage = ImageIO.read(stream);
-            return new ImageIcon(bufferedImage);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private ImageIcon scaleIcon(ImageIcon icon, int size) {

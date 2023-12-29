@@ -4,6 +4,7 @@ import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import org.baldelliandrea.utils.MusicPlayerUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -57,57 +58,70 @@ public class SongCacheManager {
     }
 
     private Song createCacheForSong(String songPath, String filename) {
+
+        // Initialize default values
+        String title = filename.substring(0, filename.lastIndexOf("."));
+        String artist = "No artist";
+        String album = "No album";
+        String genre = "No genre";
+        ImageIcon cover = new ImageIcon(MusicPlayerUtils.getSpriteResource("controls/play-circle.png").getImage());
+        String coverPath100 = cacheFolderPath + "\\No%20album" + "100.jpg";
+        String coverPath45 = cacheFolderPath + "\\No%20album" + "45.jpg";
+        long creationTime = 0;
+        long lastModified = 0;
+
+        // Read ID3 Tag and metadata if present
         try {
             Mp3File mp3file = new Mp3File(songPath);
             if (mp3file.hasId3v2Tag()) {
                 ID3v2 id3v2Tag = mp3file.getId3v2Tag();
-                String title = id3v2Tag.getTitle();
-                String artist = id3v2Tag.getArtist();
-                String album = id3v2Tag.getAlbum();
-                String genre = id3v2Tag.getGenreDescription();
+                title = id3v2Tag.getTitle() != null ? id3v2Tag.getTitle() : title;
+                artist = id3v2Tag.getArtist() != null ? id3v2Tag.getArtist() : artist;
+                album = id3v2Tag.getAlbum() != null ? id3v2Tag.getAlbum() : album;
+                genre = id3v2Tag.getGenreDescription() != null ? id3v2Tag.getGenreDescription() : genre;
 
-                title = title == null ? "No title" : title;
-                artist = artist == null ? "No artist" : artist;
-                album = album == null ? "No album" : album;
-                genre = genre == null ? "No genre" : genre;
+                coverPath100 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "100.jpg";
+                coverPath45 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "45.jpg";
 
-                String coverPath100 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "100.jpg";
-                String coverPath45 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "45.jpg";
-
-                File cover100 = new File(coverPath100);
-                File cover45 = new File(coverPath45);
-
-                ImageIcon cover = new ImageIcon(id3v2Tag.getAlbumImage());
-                if (!cover100.exists())
-                    ImageIO.write(resizeImageSmooth(cover.getImage(), 100, 100), "jpg", Files.newOutputStream(Paths.get(coverPath100)));
-                if (!cover45.exists())
-                    ImageIO.write(resizeImageSmooth(cover.getImage(), 45, 45), "jpg", Files.newOutputStream(Paths.get(coverPath45)));
-
-                long creationTime = Files.readAttributes(new File(songPath).toPath(), BasicFileAttributes.class).creationTime().toMillis();
-                long lastModified = new File(songPath).lastModified();
-
-                File tagCache = new File(cacheFolderPath + "\\" + filename);
-                BufferedWriter bw = new BufferedWriter(new FileWriter(tagCache));
-                bw.write(title);
-                bw.newLine();
-                bw.write(artist);
-                bw.newLine();
-                bw.write(album);
-                bw.newLine();
-                bw.write(genre);
-                bw.newLine();
-                bw.write(coverPath100);
-                bw.newLine();
-                bw.write(coverPath45);
-                bw.newLine();
-                bw.close();
-
-                return new Song(title, artist, album, genre, filename, songPath, coverPath100, coverPath45, creationTime, lastModified);
+                cover = new ImageIcon(id3v2Tag.getAlbumImage());
             }
+
+            creationTime = Files.readAttributes(new File(songPath).toPath(), BasicFileAttributes.class).creationTime().toMillis();
+            lastModified = new File(songPath).lastModified();
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-        return null;
+
+        // Write cache file
+        try {
+            File cover100 = new File(coverPath100);
+            File cover45 = new File(coverPath45);
+
+            if (!cover100.exists())
+                ImageIO.write(resizeImageSmooth(cover.getImage(), 100, 100), "jpg", Files.newOutputStream(Paths.get(coverPath100)));
+            if (!cover45.exists())
+                ImageIO.write(resizeImageSmooth(cover.getImage(), 45, 45), "jpg", Files.newOutputStream(Paths.get(coverPath45)));
+
+            File tagCache = new File(cacheFolderPath + "\\" + filename);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(tagCache));
+            bw.write(title);
+            bw.newLine();
+            bw.write(artist);
+            bw.newLine();
+            bw.write(album);
+            bw.newLine();
+            bw.write(genre);
+            bw.newLine();
+            bw.write(coverPath100);
+            bw.newLine();
+            bw.write(coverPath45);
+            bw.newLine();
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new Song(title, artist, album, genre, filename, songPath, coverPath100, coverPath45, creationTime, lastModified);
     }
 
     private BufferedImage resizeImageSmooth(final Image image, int width, int height) {
