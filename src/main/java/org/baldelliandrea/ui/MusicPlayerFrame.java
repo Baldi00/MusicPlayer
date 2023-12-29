@@ -77,6 +77,7 @@ public class MusicPlayerFrame extends JFrame {
         createPlaylistsButtons();
         createControlButtons();
         createAndShowWindow();
+        createTrayIcon();
     }
 
     public void updateSlider(int value, int max) {
@@ -106,7 +107,7 @@ public class MusicPlayerFrame extends JFrame {
 
     public void updatePlayPauseButton(boolean isPlaying) {
         ImageIcon icon = isPlaying ? pauseIcon : playIcon;
-        playButton.setIcon(scaleIcon(icon, 60));
+        playButton.setIcon(MusicPlayerUtils.scaleIcon(icon, 60));
     }
 
     public void updateRepeatButton(RepeatMode repeatMode) {
@@ -122,12 +123,12 @@ public class MusicPlayerFrame extends JFrame {
                 icon = repeat1Icon;
                 break;
         }
-        repeatButton.setIcon(scaleIcon(icon, 20));
+        repeatButton.setIcon(MusicPlayerUtils.scaleIcon(icon, 20));
     }
 
     public void updateShuffleButton(boolean shuffle) {
         ImageIcon icon = shuffle ? shuffleIcon : shuffleOffIcon;
-        shuffleButton.setIcon(scaleIcon(icon, 20));
+        shuffleButton.setIcon(MusicPlayerUtils.scaleIcon(icon, 20));
     }
 
     public void toggleVisibility() {
@@ -324,7 +325,7 @@ public class MusicPlayerFrame extends JFrame {
     }
 
     private JButton createControlButton(ImageIcon icon, int size) {
-        JButton controlButton = new JButton(scaleIcon(icon, size));
+        JButton controlButton = new JButton(MusicPlayerUtils.scaleIcon(icon, size));
         controlButton.setBackground(new Color(0, 0, 0, 0));
         return controlButton;
     }
@@ -490,7 +491,7 @@ public class MusicPlayerFrame extends JFrame {
 
         currentSongInfoLabel = new JLabel();
         currentSongInfoLabel.setText(formatSongText("Title", "Artist", "Album", 5));
-        currentSongInfoLabel.setIcon(scaleIcon(playIcon, 100));
+        currentSongInfoLabel.setIcon(MusicPlayerUtils.scaleIcon(playIcon, 100));
         currentSongInfoLabel.setIconTextGap(10);
         currentSongInfoLabel.setFont(currentSongInfoLabel.getFont().deriveFont(25f));
         currentSongInfoLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
@@ -508,8 +509,63 @@ public class MusicPlayerFrame extends JFrame {
         return southPanel;
     }
 
-    private ImageIcon scaleIcon(ImageIcon icon, int size) {
-        return new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+    private void createTrayIcon() {
+
+        //Check the SystemTray is supported
+        if (!SystemTray.isSupported()) {
+            System.out.println("SystemTray is not supported");
+            return;
+        }
+
+        PopupMenu popup = new PopupMenu();
+        TrayIcon trayIcon = new TrayIcon(MusicPlayerUtils.scaleIcon(
+                MusicPlayerUtils.getSpriteResource("musicPlayerIcon64.png"), 16).getImage());
+        SystemTray tray = SystemTray.getSystemTray();
+
+        trayIcon.addActionListener(actionEvent -> {
+            if (!isVisible()) {
+                setState(Frame.NORMAL);
+                setVisible(true);
+                toFront();
+                requestFocus();
+            }
+        });
+
+        // Create a pop-up menu components
+        MenuItem playPause = new MenuItem("Play/Pause");
+        MenuItem next = new MenuItem("Next");
+        MenuItem previous = new MenuItem("Previous");
+        MenuItem showPlayer = new MenuItem("Show Player");
+        MenuItem exit = new MenuItem("Exit");
+
+        playPause.addActionListener(actionEvent -> musicPlayer.togglePlayPause());
+        next.addActionListener(actionEvent -> musicPlayer.nextPositionInSongQueue());
+        previous.addActionListener(actionEvent -> musicPlayer.prevPositionInSongQueue());
+        showPlayer.addActionListener(actionEvent -> {
+            if (!isVisible()) {
+                setState(Frame.NORMAL);
+                setVisible(true);
+                toFront();
+                requestFocus();
+            }
+        });
+        exit.addActionListener(actionEvent -> System.exit(0));
+
+        //Add components to pop-up menu
+        popup.add(playPause);
+        popup.add(next);
+        popup.add(previous);
+        popup.addSeparator();
+        popup.add(showPlayer);
+        popup.add(exit);
+
+        trayIcon.setPopupMenu(popup);
+
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e) {
+            System.out.println("TrayIcon could not be added.");
+        }
     }
 
     private String formatSongText(String title, String artist, String album, int size) {

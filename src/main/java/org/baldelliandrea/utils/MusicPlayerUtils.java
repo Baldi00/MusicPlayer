@@ -4,6 +4,7 @@ import org.baldelliandrea.ui.MusicPlayerFrame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,10 @@ public class MusicPlayerUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static ImageIcon scaleIcon(ImageIcon icon, int size) {
+        return new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
     }
 
     private MusicPlayerUtils() {
