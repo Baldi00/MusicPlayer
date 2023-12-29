@@ -87,6 +87,9 @@ public class MusicPlayer {
     }
 
     public void setPositionInSongQueue(int position) {
+        if(songsQueue.isEmpty())
+            return;
+
         songsQueuePosition = position;
         if (position < 0)
             songsQueuePosition = Math.max(0, songsQueue.size() - 1 + position);
