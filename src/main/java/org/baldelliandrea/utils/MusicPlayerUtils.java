@@ -10,6 +10,11 @@ import java.io.InputStream;
 import java.util.MissingResourceException;
 
 public class MusicPlayerUtils {
+
+    public static final String PROGRAM_DATA_FOLDER_PATH = System.getenv("APPDATA") + "\\BaldelliMusicPlayer";
+    public static final String CACHE_FOLDER_PATH = System.getenv("APPDATA") + "\\BaldelliMusicPlayer\\cache";
+    public static final String SONGS_PATHS_FILE = MusicPlayerUtils.PROGRAM_DATA_FOLDER_PATH + "\\songsPath.txt";
+
     public static ImageIcon getSpriteResource(String path) {
         try (InputStream stream = MusicPlayerFrame.class.getClassLoader().getResourceAsStream(path)) {
             if (stream == null)
@@ -19,5 +24,8 @@ public class MusicPlayerUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private MusicPlayerUtils() {
     }
 }

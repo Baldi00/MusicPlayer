@@ -7,11 +7,14 @@ import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongCacheManager;
 import org.baldelliandrea.ui.MediaControlFrame;
 import org.baldelliandrea.ui.MusicPlayerFrame;
+import org.baldelliandrea.utils.MusicPlayerUtils;
 
-import java.io.File;
+import javax.swing.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
-import javax.swing.*;
 
 public class Main {
 
@@ -30,12 +33,49 @@ public class Main {
         registerHotkeys();
         setLookAndFeel();
         songCacheManager = new SongCacheManager();
-        loadSongList(System.getenv("USERPROFILE") + "\\Music");
+        songsList = new TreeMap<>();
+
+        List<String> songsPaths = getSongsPaths();
+        for (String songsPath : songsPaths)
+            loadSongList(songsPath);
+
         musicPlayer = new MusicPlayer();
         musicPlayerFrame = new MusicPlayerFrame(songsList, musicPlayer);
         mediaControlFrame = new MediaControlFrame(musicPlayer);
         musicPlayer.setMusicPlayerFrame(musicPlayerFrame);
         musicPlayer.setMediaControlFrame(mediaControlFrame);
+    }
+
+    private static List<String> getSongsPaths() {
+        List<String> songsPaths = new ArrayList<>();
+        File songsPathsFile = new File(MusicPlayerUtils.SONGS_PATHS_FILE);
+
+        // First songs paths file creation
+        if (!songsPathsFile.exists()) {
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(songsPathsFile));
+                bw.write(System.getenv("USERPROFILE") + "\\Music");
+                bw.newLine();
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Read file
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(songsPathsFile));
+            String line = br.readLine();
+            while (line != null) {
+                songsPaths.add(line);
+                line = br.readLine();
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return songsPaths;
     }
 
     private static void setLookAndFeel() {
@@ -81,7 +121,6 @@ public class Main {
     }
 
     public static void loadSongList(String startFolderPath) {
-        songsList = new TreeMap<>();
         loadSongListRecursive(new File(startFolderPath));
     }
 

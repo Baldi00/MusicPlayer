@@ -17,14 +17,12 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class SongCacheManager {
-    private final String programDataFolderPath = System.getenv("APPDATA") + "\\BaldelliMusicPlayer";
-    private final String cacheFolderPath = System.getenv("APPDATA") + "\\BaldelliMusicPlayer\\cache";
 
     public SongCacheManager() {
-        File programDataFolder = new File(programDataFolderPath);
+        File programDataFolder = new File(MusicPlayerUtils.PROGRAM_DATA_FOLDER_PATH);
         if (!programDataFolder.exists())
             programDataFolder.mkdir();
-        File cacheFolder = new File(cacheFolderPath);
+        File cacheFolder = new File(MusicPlayerUtils.CACHE_FOLDER_PATH);
         if (!cacheFolder.exists())
             cacheFolder.mkdir();
     }
@@ -36,12 +34,12 @@ public class SongCacheManager {
     }
 
     private boolean isSongCached(String filename) {
-        return new File(cacheFolderPath + "\\" + filename).exists();
+        return new File(MusicPlayerUtils.CACHE_FOLDER_PATH + "\\" + filename).exists();
     }
 
     private Song getCachedSong(String songPath, String filename) {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(cacheFolderPath + "\\" + filename));
+            BufferedReader br = new BufferedReader(new FileReader(MusicPlayerUtils.CACHE_FOLDER_PATH + "\\" + filename));
             String title = br.readLine();
             String artist = br.readLine();
             String album = br.readLine();
@@ -65,8 +63,8 @@ public class SongCacheManager {
         String album = "No album";
         String genre = "No genre";
         ImageIcon cover = new ImageIcon(MusicPlayerUtils.getSpriteResource("controls/play-circle.png").getImage());
-        String coverPath100 = cacheFolderPath + "\\No%20album" + "100.jpg";
-        String coverPath45 = cacheFolderPath + "\\No%20album" + "45.jpg";
+        String coverPath100 = MusicPlayerUtils.CACHE_FOLDER_PATH + "\\No%20album" + "100.jpg";
+        String coverPath45 = MusicPlayerUtils.CACHE_FOLDER_PATH + "\\No%20album" + "45.jpg";
         long creationTime = 0;
         long lastModified = 0;
 
@@ -80,8 +78,8 @@ public class SongCacheManager {
                 album = id3v2Tag.getAlbum() != null ? id3v2Tag.getAlbum() : album;
                 genre = id3v2Tag.getGenreDescription() != null ? id3v2Tag.getGenreDescription() : genre;
 
-                coverPath100 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "100.jpg";
-                coverPath45 = cacheFolderPath + "\\" + URLEncoder.encode(album, "UTF-8") + "45.jpg";
+                coverPath100 = MusicPlayerUtils.CACHE_FOLDER_PATH + "\\" + URLEncoder.encode(album, "UTF-8") + "100.jpg";
+                coverPath45 = MusicPlayerUtils.CACHE_FOLDER_PATH + "\\" + URLEncoder.encode(album, "UTF-8") + "45.jpg";
 
                 cover = new ImageIcon(id3v2Tag.getAlbumImage());
             }
@@ -102,7 +100,7 @@ public class SongCacheManager {
             if (!cover45.exists())
                 ImageIO.write(resizeImageSmooth(cover.getImage(), 45, 45), "jpg", Files.newOutputStream(Paths.get(coverPath45)));
 
-            File tagCache = new File(cacheFolderPath + "\\" + filename);
+            File tagCache = new File(MusicPlayerUtils.CACHE_FOLDER_PATH + "\\" + filename);
             BufferedWriter bw = new BufferedWriter(new FileWriter(tagCache));
             bw.write(title);
             bw.newLine();

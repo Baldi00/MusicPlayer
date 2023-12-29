@@ -9,17 +9,19 @@ import org.baldelliandrea.song.SongLastModifiedComparator;
 import org.baldelliandrea.song.SongTitleComparator;
 import org.baldelliandrea.utils.MusicPlayerUtils;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.MouseInputListener;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class MusicPlayerFrame extends JFrame {
     private TreeMap<String, Song> songsList;
@@ -49,12 +51,14 @@ public class MusicPlayerFrame extends JFrame {
     private ImageIcon repeatIcon;
     private ImageIcon repeat1Icon;
     private ImageIcon repeatOffIcon;
+    private ImageIcon settingsIcon;
 
     private JButton playButton;
     private JButton prevButton;
     private JButton nextButton;
     private JButton shuffleButton;
     private JButton repeatButton;
+    private JButton settingsButton;
 
     private JLabel currentSongInfoLabel;
     private JSlider songSlider;
@@ -147,6 +151,7 @@ public class MusicPlayerFrame extends JFrame {
         repeatIcon = MusicPlayerUtils.getSpriteResource("controls/repeat.png");
         repeat1Icon = MusicPlayerUtils.getSpriteResource("controls/repeat-1.png");
         repeatOffIcon = MusicPlayerUtils.getSpriteResource("controls/repeat-off.png");
+        settingsIcon = MusicPlayerUtils.getSpriteResource("controls/settings.png");
     }
 
     private void createTitleArtistAlbumButtons() {
@@ -306,6 +311,14 @@ public class MusicPlayerFrame extends JFrame {
         repeatButton.addActionListener(actionEvent -> {
             RepeatMode nextRepeatMode = RepeatMode.values()[(musicPlayer.getRepeatMode().ordinal() + 1) % 3];
             musicPlayer.setRepeatMode(nextRepeatMode);
+        });
+        settingsButton = createControlButton(settingsIcon, 20);
+        settingsButton.addActionListener(actionEvent -> {
+            try {
+                Desktop.getDesktop().open(new File(MusicPlayerUtils.SONGS_PATHS_FILE));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
     }
@@ -483,13 +496,14 @@ public class MusicPlayerFrame extends JFrame {
         currentSongInfoLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         currentSongPanel.add(currentSongInfoLabel, BorderLayout.WEST);
 
-        JPanel rightSouthFillerPanel = new JPanel();
-        rightSouthFillerPanel.setPreferredSize(new Dimension(700, 0));
+        JPanel rightSouthSettingsPanel = new JPanel(new BorderLayout());
+        rightSouthSettingsPanel.setPreferredSize(new Dimension(700, 0));
+        rightSouthSettingsPanel.add(settingsButton, BorderLayout.EAST);
 
         southPanel.add(controlsPanel, BorderLayout.CENTER);
         southPanel.add(sliderPanel, BorderLayout.NORTH);
         southPanel.add(currentSongPanel, BorderLayout.WEST);
-        southPanel.add(rightSouthFillerPanel, BorderLayout.EAST);
+        southPanel.add(rightSouthSettingsPanel, BorderLayout.EAST);
 
         return southPanel;
     }
