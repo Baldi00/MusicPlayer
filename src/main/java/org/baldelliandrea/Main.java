@@ -35,7 +35,7 @@ public class Main {
         songCacheManager = new SongCacheManager();
         songsList = new TreeMap<>();
 
-        List<String> songsPaths = getSongsPaths();
+        List<String> songsPaths = MusicPlayerUtils.getSongsPaths();
         for (String songsPath : songsPaths)
             loadSongList(songsPath);
 
@@ -44,38 +44,6 @@ public class Main {
         mediaControlFrame = new MediaControlFrame(musicPlayer);
         musicPlayer.setMusicPlayerFrame(musicPlayerFrame);
         musicPlayer.setMediaControlFrame(mediaControlFrame);
-    }
-
-    private static List<String> getSongsPaths() {
-        List<String> songsPaths = new ArrayList<>();
-        File songsPathsFile = new File(MusicPlayerUtils.SONGS_PATHS_FILE);
-
-        // First songs paths file creation
-        if (!songsPathsFile.exists()) {
-            try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(songsPathsFile));
-                bw.write(System.getenv("USERPROFILE") + "\\Music");
-                bw.newLine();
-                bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Read file
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(songsPathsFile));
-            String line = br.readLine();
-            while (line != null) {
-                songsPaths.add(line);
-                line = br.readLine();
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return songsPaths;
     }
 
     private static void setLookAndFeel() {

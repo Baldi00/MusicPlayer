@@ -6,8 +6,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.MissingResourceException;
 
 public class MusicPlayerUtils {
@@ -29,6 +30,38 @@ public class MusicPlayerUtils {
 
     public static ImageIcon scaleIcon(ImageIcon icon, int size) {
         return new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+    }
+
+    public static List<String> getSongsPaths() {
+        List<String> songsPaths = new ArrayList<>();
+        File songsPathsFile = new File(MusicPlayerUtils.SONGS_PATHS_FILE);
+
+        // First songs paths file creation
+        if (!songsPathsFile.exists()) {
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(songsPathsFile));
+                bw.write(System.getenv("USERPROFILE") + "\\Music");
+                bw.newLine();
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Read file
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(songsPathsFile));
+            String line = br.readLine();
+            while (line != null) {
+                songsPaths.add(line);
+                line = br.readLine();
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return songsPaths;
     }
 
     private MusicPlayerUtils() {

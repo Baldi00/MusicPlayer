@@ -1,16 +1,16 @@
 package org.baldelliandrea.playlist;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongCacheManager;
+import org.baldelliandrea.utils.MusicPlayerUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -20,12 +20,12 @@ public class PlaylistManager {
         Map<String, List<Song>> playlists = new TreeMap<>();
         SongCacheManager songCacheManager = new SongCacheManager();
 
-        for(String playlistPath : getPlaylistsPaths()) {
+        for (String playlistPath : getPlaylistsPaths()) {
             String playlistName = new File(playlistPath).getName().replace(".zpl", "");
             List<Song> songsList = new ArrayList<>();
             for (String songPath : getPlaylistSongsPaths(playlistPath)) {
                 File songFile = new File(songPath);
-                if(!songFile.getName().toLowerCase().endsWith(".mp3"))
+                if (!songFile.getName().toLowerCase().endsWith(".mp3"))
                     continue;
                 songsList.add(songCacheManager.getSong(songFile.getAbsolutePath(), songFile.getName()));
             }
@@ -37,7 +37,8 @@ public class PlaylistManager {
 
     private static List<String> getPlaylistsPaths() {
         List<String> playlistsPaths = new ArrayList<>();
-        getPlaylistsPathsRecursive(new File(System.getenv("USERPROFILE") + "\\Music"), playlistsPaths);
+        for (String songsPath : MusicPlayerUtils.getSongsPaths())
+            getPlaylistsPathsRecursive(new File(songsPath), playlistsPaths);
         return playlistsPaths;
     }
 
