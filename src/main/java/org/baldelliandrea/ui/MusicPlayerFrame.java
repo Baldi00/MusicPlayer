@@ -522,14 +522,7 @@ public class MusicPlayerFrame extends JFrame {
                 MusicPlayerUtils.getSpriteResource("musicPlayerIcon64.png"), 16).getImage());
         SystemTray tray = SystemTray.getSystemTray();
 
-        trayIcon.addActionListener(actionEvent -> {
-            if (!isVisible()) {
-                setState(Frame.NORMAL);
-                setVisible(true);
-                toFront();
-                requestFocus();
-            }
-        });
+        trayIcon.addActionListener(actionEvent -> toggleVisibility());
 
         // Create a pop-up menu components
         MenuItem playPause = new MenuItem("Play/Pause");
@@ -542,12 +535,10 @@ public class MusicPlayerFrame extends JFrame {
         next.addActionListener(actionEvent -> musicPlayer.nextPositionInSongQueue());
         previous.addActionListener(actionEvent -> musicPlayer.prevPositionInSongQueue());
         showPlayer.addActionListener(actionEvent -> {
-            if (!isVisible()) {
-                setState(Frame.NORMAL);
-                setVisible(true);
-                toFront();
-                requestFocus();
-            }
+            setState(Frame.NORMAL);
+            setVisible(true);
+            toFront();
+            requestFocus();
         });
         exit.addActionListener(actionEvent -> System.exit(0));
 
