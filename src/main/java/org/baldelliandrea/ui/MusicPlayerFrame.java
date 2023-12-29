@@ -65,6 +65,8 @@ public class MusicPlayerFrame extends JFrame {
     private JLabel songCurrentTimeLabel;
     private JLabel songTotalTimeLabel;
 
+    private MenuItem trayCurrentSongTitleArtist;
+
     public MusicPlayerFrame(TreeMap<String, Song> songsList, MusicPlayer musicPlayer) {
         this.songsList = songsList;
         this.musicPlayer = musicPlayer;
@@ -103,6 +105,7 @@ public class MusicPlayerFrame extends JFrame {
             songButton.setForeground(Color.WHITE);
 
         queueButtons.get(currentSong).setForeground(new Color(0, 128, 255));
+        trayCurrentSongTitleArtist.setLabel(currentSong.getTitle() + " - " + currentSong.getArtist());
     }
 
     public void updatePlayPauseButton(boolean isPlaying) {
@@ -530,6 +533,8 @@ public class MusicPlayerFrame extends JFrame {
         MenuItem previous = new MenuItem("Previous");
         MenuItem showPlayer = new MenuItem("Show Player");
         MenuItem exit = new MenuItem("Exit");
+        trayCurrentSongTitleArtist = new MenuItem("Title - Artist");
+        trayCurrentSongTitleArtist.setEnabled(false);
 
         playPause.addActionListener(actionEvent -> musicPlayer.togglePlayPause());
         next.addActionListener(actionEvent -> musicPlayer.nextPositionInSongQueue());
@@ -543,6 +548,8 @@ public class MusicPlayerFrame extends JFrame {
         exit.addActionListener(actionEvent -> System.exit(0));
 
         //Add components to pop-up menu
+        popup.add(trayCurrentSongTitleArtist);
+        popup.addSeparator();
         popup.add(playPause);
         popup.add(next);
         popup.add(previous);
