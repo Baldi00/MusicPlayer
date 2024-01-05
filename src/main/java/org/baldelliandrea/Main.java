@@ -7,10 +7,11 @@ import org.baldelliandrea.song.Song;
 import org.baldelliandrea.song.SongCacheManager;
 import org.baldelliandrea.ui.MediaControlFrame;
 import org.baldelliandrea.ui.MusicPlayerFrame;
+import org.baldelliandrea.ui.ProgressBarWindow;
 import org.baldelliandrea.utils.MusicPlayerUtils;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,7 @@ public class Main {
     private static MusicPlayerFrame musicPlayerFrame;
     private static MediaControlFrame mediaControlFrame;
 
+    private static List<File> filesToLoad;
     private static TreeMap<String, Song> songsList;
     private static SongCacheManager songCacheManager;
 
@@ -32,6 +34,7 @@ public class Main {
     public static void main(String[] args) {
         registerHotkeys();
         setLookAndFeel();
+
         songCacheManager = new SongCacheManager();
         songsList = new TreeMap<>();
 
@@ -89,7 +92,21 @@ public class Main {
     }
 
     public static void loadSongList(String startFolderPath) {
+        filesToLoad = new ArrayList<>();
         loadSongListRecursive(new File(startFolderPath));
+
+        ProgressBarWindow progressBarWindow = new ProgressBarWindow();
+        progressBarWindow.setProgressBarMax(filesToLoad.size());
+        progressBarWindow.setVisible(true);
+
+        for (File toLoad : filesToLoad) {
+            progressBarWindow.setLabel("Loading " + toLoad.getName());
+            songsList.put(toLoad.getName(), songCacheManager.getSong(toLoad.getAbsolutePath(), toLoad.getName()));
+            progressBarWindow.incrementProgressBar();
+        }
+
+        filesToLoad.clear();
+        progressBarWindow.dispose();
     }
 
     private static void loadSongListRecursive(File startFolder) {
@@ -98,7 +115,7 @@ public class Main {
                 if (file.isDirectory())
                     loadSongListRecursive(file);
                 else if (file.isFile() && file.getName().toLowerCase().endsWith(".mp3"))
-                    songsList.put(file.getName(), songCacheManager.getSong(file.getAbsolutePath(), file.getName()));
+                    filesToLoad.add(file);
             }
         }
     }

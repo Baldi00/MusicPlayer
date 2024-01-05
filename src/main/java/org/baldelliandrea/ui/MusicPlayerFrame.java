@@ -67,9 +67,15 @@ public class MusicPlayerFrame extends JFrame {
 
     private MenuItem trayCurrentSongTitleArtist;
 
+    private ProgressBarWindow progressBarWindow;
+
     public MusicPlayerFrame(TreeMap<String, Song> songsList, MusicPlayer musicPlayer) {
         this.songsList = songsList;
         this.musicPlayer = musicPlayer;
+
+        progressBarWindow = new ProgressBarWindow();
+        progressBarWindow.setLabel("Creating UI");
+        progressBarWindow.setVisible(true);
 
         playlistButtons = new ArrayList<>();
         songsQueue = new ArrayList<>();
@@ -78,8 +84,10 @@ public class MusicPlayerFrame extends JFrame {
         createTitleArtistAlbumButtons();
         createPlaylistsButtons();
         createControlButtons();
+
         createAndShowWindow();
         createTrayIcon();
+        progressBarWindow.dispose();
     }
 
     public void updateSlider(int value, int max) {
@@ -179,11 +187,14 @@ public class MusicPlayerFrame extends JFrame {
         artistsButtons = new TreeMap<>();
         albumsButtons = new TreeMap<>();
 
+        progressBarWindow.setProgressBarMax(songsByTitle.size() + songsByArtist.size() + songsByAlbum.size());
+
         for (Song song : songsByTitle) {
             ImageIcon cover45 = new ImageIcon(song.getCoverPath45());
             JButton songButton = createButton(formatSongText(song.getTitle(), song.getArtist(), song.getAlbum(), 3), cover45);
             songButton.addActionListener(actionEvent -> setupSongQueueAndPlay(song, songsQueue));
             songsButtons.put(song, songButton);
+            progressBarWindow.incrementProgressBar();
         }
 
         for (Song song : songsByArtist.values()) {
@@ -196,6 +207,7 @@ public class MusicPlayerFrame extends JFrame {
                 setupSongQueueAndPlay(null, songsWithArtist);
             });
             artistsButtons.put(song.getArtist(), artistButton);
+            progressBarWindow.incrementProgressBar();
         }
 
         for (Song song : songsByAlbum.values()) {
@@ -209,6 +221,7 @@ public class MusicPlayerFrame extends JFrame {
                 setupSongQueueAndPlay(null, songsWithAlbum);
             });
             albumsButtons.put(song.getAlbum(), albumButton);
+            progressBarWindow.incrementProgressBar();
         }
     }
 
