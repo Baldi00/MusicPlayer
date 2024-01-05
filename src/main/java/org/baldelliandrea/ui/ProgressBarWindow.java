@@ -20,9 +20,9 @@ public class ProgressBarWindow extends JFrame {
         add(progressBar);
 
         setSize(400, 150);
-        setUndecorated(true);
         setType(Type.UTILITY);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
     }
 
