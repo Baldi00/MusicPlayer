@@ -11,9 +11,7 @@ import org.baldelliandrea.utils.MusicPlayerUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.MouseInputListener;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -513,14 +511,24 @@ public class MusicPlayerFrame extends JFrame {
         currentSongInfoLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         currentSongPanel.add(currentSongInfoLabel, BorderLayout.WEST);
 
-        JPanel rightSouthSettingsPanel = new JPanel(new BorderLayout());
-        rightSouthSettingsPanel.setPreferredSize(new Dimension(700, 0));
-        rightSouthSettingsPanel.add(settingsButton, BorderLayout.EAST);
+        JPanel rightSouthPanel = new JPanel(new BorderLayout());
+        rightSouthPanel.setPreferredSize(new Dimension(700, 0));
+        JPanel rightSouthEastPanel = new JPanel();
+        rightSouthEastPanel.setLayout(new BoxLayout(rightSouthEastPanel, BoxLayout.X_AXIS));
+
+        JSlider volumeSlider = new JSlider(0, 1000, 1000);
+
+        volumeSlider.addChangeListener(changeEvent ->
+                musicPlayer.setVolume((double) volumeSlider.getValue() / volumeSlider.getMaximum()));
+
+        rightSouthEastPanel.add(volumeSlider);
+        rightSouthEastPanel.add(settingsButton);
+        rightSouthPanel.add(rightSouthEastPanel, BorderLayout.EAST);
 
         southPanel.add(controlsPanel, BorderLayout.CENTER);
         southPanel.add(sliderPanel, BorderLayout.NORTH);
         southPanel.add(currentSongPanel, BorderLayout.WEST);
-        southPanel.add(rightSouthSettingsPanel, BorderLayout.EAST);
+        southPanel.add(rightSouthPanel, BorderLayout.EAST);
 
         return southPanel;
     }

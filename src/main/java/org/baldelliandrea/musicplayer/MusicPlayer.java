@@ -6,7 +6,6 @@ import org.baldelliandrea.ui.MediaControlFrame;
 import org.baldelliandrea.ui.MusicPlayerFrame;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -155,6 +154,15 @@ public class MusicPlayer {
         if (songsQueue == null || !isSongSelected)
             return null;
         return songsQueue.get(songsQueuePosition);
+    }
+
+    public void setVolume(double volume) {
+        volume = Math.max(0, Math.min(1, volume));
+        try {
+            musicPlayer.setGain(volume);
+        } catch (BasicPlayerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void play() {
