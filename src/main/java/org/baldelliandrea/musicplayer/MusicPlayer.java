@@ -9,9 +9,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.sound.sampled.*;
+import java.io.File;
+
+import javax.sound.sampled.AudioInputStream;
 
 public class MusicPlayer {
-    private final BasicPlayer musicPlayer;
+    private BasicPlayer musicPlayer;
     private boolean isPlaying;
     private boolean isSongSelected;
 
@@ -29,8 +33,42 @@ public class MusicPlayer {
     private boolean shuffle;
 
     public MusicPlayer() {
-        musicPlayer = new BasicPlayer();
-        addListener();
+        try {
+            File mp3File = new File("C:\\Users\\Andrea\\Music\\Andrea\\Pop\\2U - David Guetta.mp3");
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(mp3File);
+            AudioFormat baseFormat = audioInputStream.getFormat();
+            AudioFormat decodedFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    baseFormat.getSampleRate(),
+                    16,
+                    baseFormat.getChannels(),
+                    baseFormat.getChannels() * 2,
+                    baseFormat.getSampleRate(),
+                    false
+            );
+            AudioInputStream decodedAudioInputStream = AudioSystem.getAudioInputStream(decodedFormat, audioInputStream);
+
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, decodedFormat);
+            SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
+            line.open(decodedFormat);
+            line.start();
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = decodedAudioInputStream.read(buffer)) != -1) {
+                line.write(buffer, 0, bytesRead);
+            }
+
+            line.drain();
+            line.close();
+            decodedAudioInputStream.close();
+            audioInputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        musicPlayer = new BasicPlayer();
+//        addListener();
     }
 
     public void setMusicFilePath(String path) {
@@ -87,7 +125,7 @@ public class MusicPlayer {
     }
 
     public void setPositionInSongQueue(int position) {
-        if(songsQueue.isEmpty())
+        if (songsQueue.isEmpty())
             return;
 
         songsQueuePosition = position;
