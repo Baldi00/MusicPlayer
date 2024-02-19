@@ -27,8 +27,11 @@ public class MusicPlayer {
     private RepeatMode repeatMode = RepeatMode.REPEAT_OFF;
     private boolean shuffle;
 
+    private double currentVolume;
+
     public MusicPlayer() {
         musicPlayer = new BasicPlayer();
+        currentVolume = 1;
         addListener();
     }
 
@@ -66,6 +69,7 @@ public class MusicPlayer {
             musicPlayer.stop();
             musicPlayer.seek((long) (songLengthBytes * percentage));
             musicPlayer.play();
+            setVolume(currentVolume);
             if (!isPlaying)
                 musicPlayer.pause();
         } catch (BasicPlayerException e) {
@@ -157,9 +161,9 @@ public class MusicPlayer {
     }
 
     public void setVolume(double volume) {
-        volume = Math.max(0, Math.min(1, volume));
+        currentVolume = Math.max(0, Math.min(1, volume));
         try {
-            musicPlayer.setGain(volume);
+            musicPlayer.setGain(currentVolume);
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
         }
@@ -172,6 +176,7 @@ public class MusicPlayer {
         try {
             musicPlayer.stop();
             musicPlayer.play();
+            setVolume(currentVolume);
             isPlaying = true;
             musicPlayerFrame.updatePlayPauseButton(true);
             mediaControlFrame.updatePlayPauseButton(true);
